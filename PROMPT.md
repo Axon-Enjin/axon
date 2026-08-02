@@ -125,7 +125,103 @@ Edges are additionally gated on absolute progress by `clamp((p - 0.22) / 0.12)`,
 | 0.70 | 2.40 | pushing back in as connections dominate |
 | 1.00 | 2.05 | settled, slow orbit |
 
-Interpolate with `easeInOutCubic` between the keys. Rotation: `rotY = p * 3.6`, `rotX = sin(p * 2.4) * 0.30`. Projection is `f = camZ / (camZ - z)` — a real perspective divide, not a fake 2D scale.
+Interpolate with `easeInOutCubic` between the keys. Rotation: `rotY = p * 3.6`, `rotX = sin(p * 2.4) * 0.30`.
+
+---
+
+## THE CAMERA GOES INSIDE
+
+Scroll does not orbit the cloud — it **flies you into it and down a corridor**. That demands a real pinhole camera with a near plane, which the exterior-only version never needed.
+
+```js
+const FOCAL_IN = 1.60, NEAR = .12, FOG_NEAR = 2.4, FOG_FAR = 7.0;
+
+// world -> camera: TRANSLATE first, then aim. Rotate first and the look
+// direction pivots around the world origin instead of the camera.
+const dx = wx-cam.x, dy = wy-cam.y, dz = wz-cam.z;
+const X = dx*cosYaw + dz*sinYaw;
+let   Z = dz*cosYaw - dx*sinYaw;
+const Y = dy*cosPitch - Z*sinPitch;  Z = Z*cosPitch + dy*sinPitch;
+const depth = -Z;                                   // camera looks toward -z
+if (depth < NEAR || depth > FOG_FAR) { vis[k] = 0; continue; }   // REAL cull
+const f = FOCAL / depth;
+```
+
+- **The old `f = camZ / max(camZ - z, .25)` cannot go inside.** That clamp exists only because the camera was always outside; cross into the cloud and every node behind the lens gets `f = 4*camZ` and lands as a giant mirrored dot. Replace it, do not patch it.
+- **Cull edges when either endpoint is culled.** A line to a node with no valid screen position streaks across the entire frame. This is *the* artifact of going inside — assert the count is exactly 0.
+- Trails and pointer springs must skip culled nodes too, or they smear from stale coordinates.
+- **Painter's order**: sort visible indices by depth descending each frame and draw nodes far-to-near. Cheap (~290 visible) and required once near and far overlap.
+- **Focal equals camera distance while outside.** That is algebraically identical to the old projection, so the boot frames unchanged — verified at **0px difference** across the whole boot. It widens to `FOCAL_IN` across the dive for a dramatic tunnel lens.
+- **Handheld float is interior-only.** Left running during the boot it adds a ~32px sway on top of the rig's CSS pan that the verified sequence never had.
+
+### Geometry: ball plus corridor
+
+The ball (nodes `0..259`) is untouched — the whole boot is tuned against it. A corridor of 800 more extends along `-z`:
+
+```
+u = (i-260)/M
+z      = -0.6 - u*19
+radius = (.35 + .5*hash(i)) * (.70 + .5*sin(u*6*PI))   // chambers and necks
+birth  = .32 + clamp(u*.60 - .08)                      // after the pause, ahead of the camera
+```
+
+- **The corridor must be longer than flight distance + fog depth.** At length 11 with the camera stopping at `-10.2`, the tunnel emptied to 69 visible nodes at the end. Length 19 against a `-12` stop keeps ~290 nodes and ~1400 edges in view at every depth.
+- **The corridor needs its own link threshold** (`0.36` vs the ball's `0.26`). It is sparser, so at the ball's threshold mean spacing exceeds reach and the tube reads as loose drifting dots instead of a structure.
+- **Never link ball to corridor.** The ball spins and the corridor does not, so a cross-group edge stretches and swings every frame.
+- **The ball keeps its world spin; the corridor is fixed in world space.** Rotating the corridor about Y would swing the flight path out from under the camera.
+
+### The destination — where the tunnel arrives
+
+The flight ends at **the network from the opening, now wired up and named**. Same generator as the ball (offset hash so it is not a literal clone), `D = 300`, centred at `Z_DEST = -14.8`, `birth .72` so it materialises out of the fog as you approach.
+
+- The camera parks at `-12.0`, which puts the destination `2.8` ahead — **the same distance as the opening pause**, and the lens narrows back to `2.40` across `.86 → 1.0` so it fills the frame exactly as the ball did. That framing rhyme is the whole point: you end where you began, connected.
+- **Connections form on arrival.** Nodes are already there; a per-group edge gate `clamp((p-.84)/.10)` wires them up between `.84` and `.94` while a `win(p,.84,.87,.93,.99)` window runs the fresh links hot white before they settle to cyan. The edge gate **must be per group** — a single global gate cannot give the destination its own beat.
+- **Labels live here, on the outer shell.** Six labels on high-index (large radius) nodes; inner-shell nodes sit too close to the core to read. Gate them on real depth (`pdep < camDist + .40`), not on `pf > .85` — `pf` is `focal/depth` and lands right on `.85` at this distance, so it flickers. Four are visible at rest and **all six are reachable by orbiting**, which is what makes turning it worth doing.
+- Corridor shortened to `12.9` so it opens into the chamber instead of running through it. It no longer has to outlast flight+fog alone, because the destination fills the far field from `p ≈ .70`.
+
+### Drag: one pivot, three behaviours
+
+The subject must never be lost off-screen. It is solved structurally, not with a clamp:
+
+```js
+orbitAmt = max(1 - seg(p,.30,.42), seg(p,.78,.88));   // 1 outside, 0 in tunnel, 1 at the end
+pivotZ   = keyed(p, [[0,0],[.35,0],[.80,Z_DEST],[1,Z_DEST]]);
+// world rotates about the pivot by orbit.* * orbitAmt; camera aims by orbit.* * (1-orbitAmt)
+```
+
+- **Outside and at the destination, drag orbits a subject at screen centre** — it cannot leave the frame. Verified: a full 6-radian yaw sweep moves the destination's centroid by at most 44px.
+- **The rotation applies to the SUBJECT GROUP ONLY, never the whole world.** Rotate everything about the destination's centre and the corridor swings with it, sweeping tunnel fragments across the object you are inspecting. Assert a drag at the finale moves destination nodes and **zero** corridor nodes.
+- **Fade the corridor out on arrival** (`1 - seg(p,.84,.95)`). Its last stretch lies between the camera and the destination, so leaving it lit clutters the final shot even when it is holding still.
+- **In the tunnel there is no subject**, so drag aims the camera, clamped to `±0.45` yaw / `±0.40` pitch and decaying `*= .94` back to centre on release (~1.5s).
+- **Hitting a bound must zero the velocity into it.** Otherwise a hard fling re-slams the clamp every frame and the view sits pinned at the limit instead of easing back. An 18.9-radian fling — three full revolutions — must clamp and then recentre.
+- The orbit integration has to run **after** `p` is computed, or the phase test reads a stale progress value.
+
+### Camera path and fog
+
+`CAM_Z` keys: `.30 → 2.84` (the pause) `→ .42 → 0` (crossing in) `→ -12.0` at `p=1`. **Space the corridor keys evenly** — `keyed()` eases in-out on every leg, so widely spaced keys make the flight lurch (slow, then a rush).
+
+```js
+alpha *= clamp((depth-NEAR)/.5)                                   // fade in at the lens
+       * (1 - fogAmt*clamp((depth-FOG_NEAR)/(FOG_FAR-FOG_NEAR))); // fog out
+```
+Fog ramps in with the dive so the exterior keeps its original look. It is also the performance mechanism: culling at `FOG_FAR` bounds per-frame work to ~290 nodes regardless of how long the corridor is. Measured **7.1ms per frame** at the deepest point against a 16.7ms budget, with the blurred depth-echo pass faded out across the dive.
+
+**Drag becomes look** once inside: `orbit.x` is yaw, `orbit.y` is pitch, applied as camera rotation instead of world spin. Inertia, the `±1.15 rad` pitch clamp and the touch `pan-y` rule all carry over unchanged.
+
+---
+
+## BOOTING — WHAT COMES BEFORE THE LOADER
+
+The collision is an animation, not a progress bar, so it must not start until the page can actually run it at frame rate. A three-dot boot screen covers the gap.
+
+- **The dots are painted by critical CSS inlined in `<head>`, with no dependency on Tailwind, the fonts, or the app script.** They are the first element in `<body>`. This is the whole point: they render on the first frame, whatever else is still in flight.
+- **Nothing render-blocking may sit in `<head>`.** Move `cdn.tailwindcss.com` and Iconify to the **end of `<body>`** (Tailwind first, then its config assignment — the Play CDN needs that order), and load the font stylesheets with `media="print" onload="this.media='all'"`. As blocking head resources these held first paint at ~440ms with nothing on screen.
+- **Gate the reveal on three things**: the `load` event and `document.fonts.ready` (capped at 3.5s so a slow CDN cannot strand anyone), a **Tailwind probe** (append a `bg-void` element and check the computed colour is `rgb(4,6,13)` — Tailwind is a runtime compiler down there, and revealing before it finishes flashes unstyled markup), and **3–4 warm frames**, so the collision's first frame is not the one paying for layout.
+- Once booted, set `gateReady = true`. Readiness is already proven, so the approach runs as a clean constant-speed animation and the stalled-hover path never triggers.
+- **Skip the canvas entirely while the overlay is opaque.** During the approach the loader covers everything, so rendering 1120 nodes and 4427 edges underneath buys nothing and steals frames from the one thing being watched. Start rendering at the closing rush — well before the overlay fades, so the atom is there for the handoff.
+- Build edges with **squared distance**, taking `Math.sqrt` only on the ~4400 hits rather than all 627k pair tests. `Math.hypot` is overflow-safe and slow; this is a free 2x (24ms → 13ms).
+
+Remaining lever, not taken: the Tailwind Play CDN is a build tool doing its work in the browser on every visit. Compiling the CSS ahead of time is the real cold-load fix, but it needs a build step, which this project deliberately does not have.
 
 ---
 
@@ -400,6 +496,12 @@ Reveal these with a single `IntersectionObserver` at `threshold: 0.15`, translat
 - **Do not ease the points' travel.** No acceleration into contact, no deceleration near it. One constant px/sec the whole way, with `closeDur` derived from that speed.
 - **Do not put a held beat between contact and the expansion.** No blackout, no charge, no stutter — each one reads as the sequence stalling. Contact, blast, multiply: one move.
 - **Do not animate the centre point.** No radius sine, no jitter. At the middle of the frame that reads as flicker.
+- **Do not clamp the perspective divide.** `max(camZ - z, .25)` is a stand-in for a near plane and it fails the moment the camera goes inside. Cull instead.
+- **Do not draw an edge whose endpoint was culled.** It streaks across the whole frame.
+- **Do not let the corridor end within fog range of where the camera stops** unless something else fills the far field. You fly out the back and the tunnel empties.
+- **Do not stroke edges one at a time.** With ~1900 in view that is 32ms/frame on its own. Batch into ~10 quantised-alpha `Path2D` buckets and stroke each once: identical on 1px lines, and it took the finale from **38.8ms to 5.4ms**. Same for the travelling-signal dots.
+- **Do not leave a subject unpinned when drag is active.** Free camera-look loses the network off-frame with no way back. Orbit a pivot wherever there is a subject; clamp and recentre only where there is not.
+- **Do not gate labels on `pf`.** It is `focal/depth` and sits near the threshold at the destination, so labels flicker. Use real depth.
 - **Do not leave the core bloom at full scale before the blast.** At full size it is a ~250px soft blob; with nothing else on screen the single atom reads as fog. Scale it to `0.26` and let the blast blow it open.
 - **Do not write effect windows as literal seconds.** Derive them from `BOOT`. `win()` latches on permanently if a retiming inverts its fade-out pair, and the failure looks like a dead sequence rather than a bad number.
 - **Do not gate the edges at or above `HOLD`.** The splash then never becomes a network, which is the single biggest reason the intro can feel disconnected from the scroll phase.

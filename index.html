@@ -7,19 +7,37 @@
 <meta name="description" content="Axon is a product agency. One spark becomes a thousand. Connection is the product.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-<link href="https://fonts.cdnfonts.com/css/garet" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<!-- Fonts load WITHOUT blocking first paint. A plain stylesheet link blocks
+     rendering, which is half the reason the first visit sat on a blank screen. -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet"
+      media="print" onload="this.media='all'">
+<link href="https://fonts.cdnfonts.com/css/garet" rel="stylesheet"
+      media="print" onload="this.media='all'">
+<!-- CRITICAL CSS: the boot dots must paint with no dependency on Tailwind, the
+     fonts, or any script. This is the only styling the first frame needs. -->
+<style>
+  html,body{margin:0;background:#04060d}
+  #boot{position:fixed;inset:0;z-index:100;background:#04060d;display:flex;
+        align-items:center;justify-content:center;transition:opacity .4s ease}
+  #boot.gone{opacity:0;pointer-events:none}
+  #boot i{width:7px;height:7px;margin:0 8px;border-radius:50%;background:#cfe3ff;
+          opacity:.16;animation:bootdot 1.3s infinite ease-in-out}
+  #boot i:nth-child(2){animation-delay:.17s}
+  #boot i:nth-child(3){animation-delay:.34s}
+  @keyframes bootdot{
+    0%,72%,100%{opacity:.16;transform:scale(.8)}
+    36%{opacity:1;transform:scale(1);box-shadow:0 0 15px 3px rgba(86,200,255,.45)}}
+</style>
 <script>
-tailwind.config = { theme: { extend: {
+window.__twConfig = { theme: { extend: {
   fontFamily: {
     display: ['JamjanNP','Anton','serif'],
     heading: ['Anton','Impact','sans-serif'],
     sans:    ['Garet','Inter','system-ui','sans-serif']
   },
   colors: { void:'#04060d', deep:'#0a1424', blue:'#2e6fff', cyan:'#56c8ff', ice:'#cfe3ff' }
-}}}
+}}};
 </script>
 <style>
   /* JamjanNP is not on a public CDN — drop the file here, otherwise Anton takes over */
@@ -62,6 +80,9 @@ tailwind.config = { theme: { extend: {
 </style>
 </head>
 <body class="bg-void font-sans text-ice antialiased">
+
+<!-- booting: paints on the first frame, before anything else exists -->
+<div id="boot"><i></i><i></i><i></i></div>
 
 <!-- ============================ LOADER ============================
      One atom, charging. The ring collapses into the singularity, so the
@@ -110,7 +131,7 @@ tailwind.config = { theme: { extend: {
 </nav>
 
 <!-- ===================== 1. GENESIS SCROLLER ====================== -->
-<section id="scroller" class="relative h-[700vh] bg-void">
+<section id="scroller" class="relative h-[1000vh] bg-void">
   <div class="stage sticky top-0 h-screen overflow-hidden bg-void">
 
     <div id="rig" class="rig absolute inset-0">
@@ -170,9 +191,11 @@ tailwind.config = { theme: { extend: {
     </div>
 
     <!-- SCENE 4 — orbit -->
-    <div id="s4" class="scene pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center">
-      <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — Orbit</p>
-      <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,7vw,96px);line-height:.92;letter-spacing:-.02em">The network<br>holds its shape</h2>
+    <div id="s4" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
+      <div class="max-w-xl">
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — Orbit</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">The network<br>holds<br>its shape</h2>
+      </div>
     </div>
 
     <!-- SCENE 5 — ascension -->
@@ -381,6 +404,31 @@ const IMPACT_SPAN = 1.40;          // seconds the impact envelope covers, from B
 // loader gate: fonts genuinely block text render, so this wait is real.
 // MIN_DWELL gives the charge time to read, CAP stops a slow font CDN stranding anyone.
 const MIN_DWELL = 1.2, CAP = 3.0, FLOOR = 110;
+
+// ---- BOOT GATE -------------------------------------------------------------
+// The dots are on screen from the first frame, painted by critical CSS with no
+// dependency on Tailwind, the fonts or this script. Nothing animated starts
+// until the work is actually finished AND a few frames have run clean, so the
+// collision never has to share its first frame with layout or a font swap.
+const bootEl = document.getElementById('boot');
+let assetsReady = false, warmFrames = 0, booted = false;
+Promise.all([
+  new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r, {once:true})),
+  document.fonts.ready
+]).then(() => { assetsReady = true; });
+setTimeout(() => { assetsReady = true; }, 3500);      // cap: never strand anyone
+// Tailwind is a runtime compiler down at the end of body; wait for it to have
+// actually produced our theme, or the reveal flashes unstyled markup.
+let twOK = false;
+function tailwindDone(){
+  if (twOK) return true;
+  const probe = document.createElement('div');
+  probe.className = 'bg-void'; probe.style.cssText = 'position:absolute;visibility:hidden';
+  document.body.appendChild(probe);
+  twOK = getComputedStyle(probe).backgroundColor === 'rgb(4, 6, 13)';
+  probe.remove();
+  return twOK;
+}
 // The two points travel at ONE constant speed the whole way in — no easing on
 // approach, no acceleration at the end. closeDur is derived from that same
 // speed so the final stretch matches it exactly and contact has no velocity
@@ -427,13 +475,16 @@ function keyed(p, k){
 }
 
 // ---- geometry: generated once, node 0 is the singularity ----
-const N = 260, LINK = .26;
-const LABEL_AT = {40:'Founders', 80:'Strategy', 120:'Design', 160:'Engineering', 200:'Growth', 240:'Users'};
+const N = 260, LINK = .26, LINK_CORR = .36, LINK_DEST = .34;
+const D = 300, Z_DEST = -14.8;                  // the network at the end of the tunnel
+const LABELS = ['Founders','Strategy','Design','Engineering','Growth','Users'];
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 const hash = n => { const v = Math.sin(n*12.9898)*43758.5453; return v - Math.floor(v); };
 
+// THE BALL — nodes 0..N-1, the thing the blast creates. Untouched: the whole
+// boot sequence (birth curve, timings, framing) is tuned against this.
 const nodes = Array.from({length:N}, (_,i) => {
-  if (i === 0) return {x:0,y:0,z:0, birth:0, seed:0, label:'Axon'};   // the core, never leaves center
+  if (i === 0) return {x:0,y:0,z:0, birth:0, seed:0, label:null, grp:0};  // the core, never leaves center
   // golden-angle azimuth + hashed latitude keeps the shape a ball;
   // radius tied to index so the cloud grows outward as nodes are born
   const u = hash(i)*2 - 1, s = Math.sqrt(Math.max(0,1-u*u)), a = GOLDEN*i;
@@ -444,14 +495,66 @@ const nodes = Array.from({length:N}, (_,i) => {
            // empty; 1.15 gives it ~69 up front and ~180 by the hold.
            birth: Math.pow(i/N, 1.15) * .46,
            seed: (i*9301+49297) % 233280 / 233280,
-           label: LABEL_AT[i] || null };
+           label: null, grp: 0 };          // labels live on the DESTINATION now
 });
 
+// THE CORRIDOR — what you fly down once you are inside. Extends away from the
+// entrance along -z. The radius modulation is the cinematography: the tube
+// opens into chambers and pinches between them instead of being a pipe.
+// The corridor now ENDS at the chamber rather than running through it. It no
+// longer has to outlast flight+fog on its own, because the destination fills
+// the far field from p ~.70 — you see where you are going down the tunnel.
+const M = 560, CORRIDOR_LEN = 12.9;
+for (let j=0;j<M;j++){
+  const i = N + j, u = j/M;
+  const a = GOLDEN*i;
+  const r = (.35 + .5*hash(i)) * (.70 + .5*Math.sin(u*6*Math.PI));
+  nodes.push({
+    x: Math.cos(a)*r, y: Math.sin(a)*r, z: -0.6 - u*CORRIDOR_LEN,
+    // Starts just AFTER the pause so the held frame stays a clean ball, then
+    // stays ahead of the camera so the tunnel is always already there when you
+    // reach it. Fog covers the materialising.
+    birth: .32 + clamp(u*.60 - .08),
+    seed: hash(i*7+3), label: null, grp: 1
+  });
+}
+const NC = nodes.length;                        // ball + corridor
+
+// THE DESTINATION — the network from the opening, waiting at the end of the
+// tunnel. Same generator as the ball on purpose: it has to READ as the thing
+// you started with, only now wired up and named.
+for (let j=0;j<D;j++){
+  const i = NC + j, s0 = j + 11;                // offset the hash so it is not a clone
+  const u = hash(s0)*2 - 1, s = Math.sqrt(Math.max(0,1-u*u)), a = GOLDEN*i;
+  const r = .28 + .72*Math.pow((j+1)/D, .55);
+  nodes.push({
+    x: Math.cos(a)*s*r, y: u*r, z: Z_DEST + Math.sin(a)*s*r,
+    birth: .72,                                 // materialises out of the fog on approach
+    seed: hash(i*3+7),
+    // Six labels on the OUTER shell (high j = large radius), spread apart by the
+    // golden angle. Inner-shell nodes sit too close to the core to read.
+    label: (j >= D-36 && (D-1-j) % 7 === 0) ? LABELS[(D-1-j)/7] : null,
+    grp: 2
+  });
+}
+const NALL = nodes.length;
+
 const edges = [];
-for (let i=0;i<N;i++) for (let j=i+1;j<N;j++){
-  const a=nodes[i], b=nodes[j];
-  const d = Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z);
-  if (d < LINK) edges.push({i, j, w: 1-d/LINK});
+for (let i=0;i<NALL;i++){
+  const a = nodes[i];
+  // the corridor is sparser than the ball, so it needs a longer reach or the
+  // tube never reads as a structure — just loose dots drifting past
+  const lim = a.grp === 0 ? LINK : a.grp === 1 ? LINK_CORR : LINK_DEST, l2 = lim*lim;
+  for (let j=i+1;j<NALL;j++){
+  // never link across groups: they rotate independently, so a cross-group edge
+  // would stretch and swing every frame
+  const b = nodes[j];
+  if (a.grp !== b.grp) continue;
+  // Compare SQUARED distance and take the sqrt only on the ~4400 hits, not on
+  // all 627k pair tests. Math.hypot is overflow-safe and slow; this is 2x.
+  const dx=a.x-b.x, dy=a.y-b.y, dz=a.z-b.z, d2 = dx*dx+dy*dy+dz*dz;
+  if (d2 < l2) edges.push({i, j, w: 1-Math.sqrt(d2)/lim, grp: a.grp});
+  }
 }
 
 // ---- canvases ----
@@ -476,8 +579,24 @@ const dust = Array.from({length:70}, () => ({
   ox:0, oy:0, vx:0, vy:0                          // pulled in by the charge, thrown by the blast
 }));
 
-const CAM = [[0,.75],[.14,2.20],[.40,3.10],[.70,2.40],[1,2.05]];
-const px=[], py=[], pf=[], pAge=[];
+// Camera path along z. Exterior keys up to the pause are the ORIGINAL ones, so
+// the boot frames exactly as it did; from the pause it dives through the ball
+// and on down the corridor.
+// Evenly spaced keys down the corridor: keyed() eases in-out on every leg, so
+// widely spaced keys make the flight lurch (slow, then a rush). Even spacing
+// keeps the cruise speed near constant.
+const CAM_Z = [[0,.75],[.14,2.20],[.30,2.84],[.42,0],[.55,-2.10],
+               [.70,-5.00],[.85,-11.4],[.90,-12.0],[1,-12.0]];   // parked for the last tenth
+// Lens: matches camera distance while outside (identical to the old projection),
+// widens for the tunnel, then narrows again so the destination fills the frame
+// the way the ball did at the opening pause.
+const FOCAL_K = [[.30,2.84],[.52,1.60],[.86,1.60],[1,2.40]];
+// What the drag rotates around: origin ball early, destination ball late.
+const PIVOT_Z = [[0,0],[.35,0],[.80,Z_DEST],[1,Z_DEST]];
+const NEAR = .12, FOG_NEAR = 2.4, FOG_FAR = 7.0, FOCAL_IN = 1.60;
+const EB = 10, EA = .55;                        // edge alpha buckets, and their top of range
+const px=[], py=[], pf=[], pAge=[], pdep=[];
+let order = [];                                 // visible indices, far to near
 
 // ---- pointer: push the nodes around, springs pull them home ----
 // ---- orbit: drag the whole network, with inertia on release ----
@@ -487,8 +606,9 @@ const ORBIT_MAX_X = 1.15;                        // radians of tilt, short of th
 let spin = 0;                                    // integrated auto-rotation
 
 const ptr = { x:-9999, y:-9999, down:false, active:false };
-const ox=new Float32Array(N), oy=new Float32Array(N), vx=new Float32Array(N), vy=new Float32Array(N);
-const ppx=new Float32Array(N), ppy=new Float32Array(N);   // previous frame, for motion-blur trails
+const ox=new Float32Array(NALL), oy=new Float32Array(NALL), vx=new Float32Array(NALL), vy=new Float32Array(NALL);
+const ppx=new Float32Array(NALL), ppy=new Float32Array(NALL); // previous frame, for motion-blur trails
+const vis=new Uint8Array(NALL);                            // 1 = in front of the near plane
 addEventListener('pointermove', e => {
   ptr.x=e.clientX; ptr.y=e.clientY; ptr.active=true;
   if (!orbit.dragging) return;
@@ -522,35 +642,104 @@ addEventListener('pointercancel',() => { endDrag(); ptr.active=false; }, {passiv
 addEventListener('pointerout',  e => { if (!e.relatedTarget) ptr.active=false; }, {passive:true});
 
 function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
-  const S    = Math.min(W,H) * .42 * spread;
-  const camZ = keyed(prog, CAM);
-  // `spin` is INTEGRATED, never t * rate: scaling t by a ramping factor makes
-  // the angle jump by whole radians the moment the factor moves
-  const ry = prog*3.6 + spin + orbit.x;
-  const rx = Math.sin(prog*2.4)*.30 + orbit.y;
-  const cy=Math.cos(ry), sy=Math.sin(ry), cx=Math.cos(rx), sx=Math.sin(rx);
-  const burst = win(prog, .78, .795, .805, .83);          // second flash: edges go white
+  const S = Math.min(W,H) * .42 * spread;
 
-  for (let k=0;k<N;k++){
+  // ---- CAMERA ----------------------------------------------------------
+  const camZ = keyed(prog, CAM_Z);
+  const dive = seg(prog, .30, .45);                       // 0 outside, 1 inside
+  const fogAmt = dive;                                    // fog only once inside
+  // Handheld float is INTERIOR ONLY. Left on during the boot it adds a ~32px
+  // sway the verified sequence never had, on top of the rig's own CSS pan.
+  const fl = reduce ? 0 : dive;
+  const cam = { x: (Math.sin(t*.13)*.10 + seg(prog,.42,1)*.10) * fl,
+                y:  Math.cos(t*.11)*.07 * fl,
+                z: camZ };
+  // Focal EQUALS camera distance while outside, which is exactly what the old
+  // camZ/(camZ-z) projection did — so the boot framing is unchanged.
+  const focal = prog <= .30 ? camZ : keyed(prog, FOCAL_K);
+
+  // Drag does two different things. Outside and at the destination it ORBITS a
+  // subject sitting at screen centre, which cannot be lost. Only in the tunnel,
+  // where there is no single subject, does it aim the camera — and there it is
+  // clamped and springs back (see frame()).
+  const orbitAmt = Math.max(1 - seg(prog,.30,.42), seg(prog,.78,.88));
+  const lookAmt  = 1 - orbitAmt;
+  const pivotZ = keyed(prog, PIVOT_Z);
+  const oy_ = orbit.x*orbitAmt, ox_ = orbit.y*orbitAmt;    // world rotation about the pivot
+  const coy=Math.cos(oy_), soy=Math.sin(oy_), cox=Math.cos(ox_), sox=Math.sin(ox_);
+  const cyw=Math.cos(orbit.x*lookAmt), syw=Math.sin(orbit.x*lookAmt);   // camera aim
+  const cpt=Math.cos(orbit.y*lookAmt), spt=Math.sin(orbit.y*lookAmt);
+  const ry = prog*3.6 + spin, rx = Math.sin(prog*2.4)*.30;
+  const cy=Math.cos(ry), sy=Math.sin(ry), cx=Math.cos(rx), sx=Math.sin(rx);
+  const burst  = win(prog, .78, .795, .805, .83);         // second flash: edges go white
+  const destOn = clamp((prog - .84) / .10);               // the destination wiring up
+  const wiring = win(prog, .84, .87, .93, .99);           // and running hot while it does
+  // The tunnel recedes once you have arrived. Its last stretch sits between the
+  // camera and the destination, so leaving it lit clutters the object you came
+  // here to look at.
+  const corrFade = 1 - seg(prog, .84, .95);
+  // The drag turns the SUBJECT, not the world: ball early, destination late.
+  // Rotating everything swings the corridor around the destination's centre and
+  // sweeps tunnel fragments across the frame.
+  const subjGrp = prog < .60 ? 0 : 2;
+
+  order.length = 0;
+  for (let k=0;k<NALL;k++){
     const n = nodes[k];
     // node 0 is the core: it EXISTS from the first frame. Deriving its age from
     // progress gives it age 0 at p=0, the draw loop skips it, and the blast then
     // detonates over an empty screen.
     const age = k === 0 ? 1 : clamp((prog - n.birth) / .10);
-    const e   = outCubic(age);                            // travel from the singularity outward
-    let x = (n.x*cy + n.z*sy)*e, z = (n.z*cy - n.x*sy)*e;
-    let y = (n.y*cx)*e - z*sx;   z = z*cx + n.y*e*sx;
-    const f = camZ / Math.max(camZ - z, .25);             // perspective, guarded
-    px[k]=W/2 + x*S*f; py[k]=H/2 + y*S*f; pf[k]=f; pAge[k]=age;
+    pAge[k] = age;
+    let wx, wy, wz;
+    if (n.grp === 0){                                     // the ball spins as it always has
+      const e = outCubic(age);                            // travel from the singularity outward
+      wx = (n.x*cy + n.z*sy)*e;
+      let z0 = (n.z*cy - n.x*sy)*e;
+      wy = (n.y*cx)*e - z0*sx;  wz = z0*cx + n.y*e*sx;
+    } else {                                              // the corridor is fixed in world
+      wx = n.x; wy = n.y; wz = n.z;                       // space, or it would swing out of
+    }                                                     // line with the flight path
+    // The drag's world rotation happens about the PIVOT, so whatever is on
+    // screen turns in place instead of swinging away from the camera.
+    if (orbitAmt > .001 && n.grp === subjGrp){
+      const rx0 = wx, rz0 = wz - pivotZ;
+      let X0 = rx0*coy + rz0*soy, Z0 = rz0*coy - rx0*soy;
+      const Y0 = wy*cox - Z0*sox;  Z0 = Z0*cox + wy*sox;
+      wx = X0; wy = Y0; wz = Z0 + pivotZ;
+    }
+    // world -> camera: TRANSLATE first, then aim. Rotating first would pivot
+    // the look direction around the world origin instead of the camera.
+    const dx = wx - cam.x, dy = wy - cam.y, dz = wz - cam.z;
+    const X = dx*cyw + dz*syw;
+    let   Z = dz*cyw - dx*syw;
+    const Y = dy*cpt - Z*spt;   Z = Z*cpt + dy*spt;
+    const depth = -Z;                                     // camera looks toward -z
+    pdep[k] = depth;
+    // a REAL near plane. The old max(camZ-z,.25) clamp turned everything behind
+    // the camera into a giant mirrored dot, which is why this never went inside.
+    if (age <= .001 || depth < NEAR || depth > FOG_FAR){ vis[k]=0; pf[k]=0; continue; }
+    vis[k] = 1;
+    const f = focal/depth;
+    px[k] = W/2 + X*S*f; py[k] = H/2 + Y*S*f; pf[k] = f;
+    order.push(k);
   }
+  // painter's order: far first, so near nodes draw over the ones behind them
+  order.sort((a,b) => pdep[b] - pdep[a]);
+
+  // depth fade: in at the near plane (stops strobing as nodes pass the lens),
+  // out into the fog (creates the volume, hides the end of the corridor)
+  const fadeOf = k => clamp((pdep[k]-NEAR)/.5)
+    * (1 - fogAmt*clamp((pdep[k]-FOG_NEAR)/(FOG_FAR-FOG_NEAR)))
+    * (nodes[k].grp === 1 ? corrFade : 1);
 
   // integrate the pointer springs once per frame (main pass only), then apply
   if (integrate && !reduce){
     // while orbiting, the cloud is being turned, not poked — repulsion off
     const R = 170, K = orbit.dragging ? 0 : 2.0;
-    for (let k=0;k<N;k++){
+    for (let k=0;k<NALL;k++){
       let fx=0, fy=0;
-      if (ptr.active && K){
+      if (ptr.active && K && vis[k]){                      // culled nodes have no screen pos
         const dx = px[k]-ptr.x, dy = py[k]-ptr.y, d2 = dx*dx + dy*dy;
         if (d2 < R*R && d2 > .01){
           const d = Math.sqrt(d2), f = (1 - d/R)*K;
@@ -562,40 +751,65 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
       ox[k]+=vx[k]; oy[k]+=vy[k];
     }
   }
-  for (let k=0;k<N;k++){ px[k]+=ox[k]; py[k]+=oy[k]; }    // edges follow, they read px/py
+  for (let k=0;k<NALL;k++){ px[k]+=ox[k]; py[k]+=oy[k]; }  // edges follow, they read px/py
 
   ctx.clearRect(0,0,W,H);
   ctx.lineWidth = 1;
+  const linePath = [], hotPath = [], dotPath = [];
+  for (let b=0;b<EB;b++){ linePath.push(new Path2D()); hotPath.push(new Path2D()); dotPath.push(new Path2D()); }
   for (const e of edges){
+    // Either endpoint culled means no valid screen position: drawing it streaks
+    // a line across the whole frame. This is THE artifact of going inside.
+    if (!vis[e.i] || !vis[e.j]) continue;
     const born = Math.min(pAge[e.i], pAge[e.j]);
     if (born <= .85) continue;                            // edges trail the births
     // Edges trail the births, and start appearing late in the main wave — the
     // old .30 gate was exactly the boot's ceiling, so the whole 5s splash drew
     // scattered dots and never once became a network.
-    const on = clamp((born - .85) / .04) * clamp((prog - .22) / .12);
+    // the destination wires itself up as you arrive — its nodes are already
+    // there, so you watch loose points become a network
+    const gate = e.grp === 2 ? destOn : clamp((prog - .22) / .12);
+    const on = clamp((born - .85) / .04) * gate;
     if (on <= .01) continue;
-    const a = e.w * on * alphaMul * (.12 + .42*clamp((pf[e.i]+pf[e.j])/2 - .6));
-    ctx.strokeStyle = burst > .01 ? `rgba(255,255,255,${a + burst*.5})` : `rgba(86,200,255,${a})`;
-    ctx.beginPath(); ctx.moveTo(px[e.i],py[e.i]); ctx.lineTo(px[e.j],py[e.j]); ctx.stroke();
+    const a = e.w * on * alphaMul * (.12 + .42*clamp((pf[e.i]+pf[e.j])/2 - .6))
+              * Math.min(fadeOf(e.i), fadeOf(e.j));
+    if (a <= .004) continue;
+    const hot = e.grp === 2 ? wiring : burst;              // fresh links run hot, then settle
+    // Batch into quantised-alpha buckets instead of stroking each edge. At the
+    // destination ~1900 individual stroke()+arc() pairs cost 32ms/frame; ten
+    // batched paths are visually identical on 1px lines and a fraction of that.
+    const b = Math.min(EB-1, (a*EB/EA)|0);
+    const P = hot > .01 ? hotPath[b] : linePath[b];
+    P.moveTo(px[e.i],py[e.i]); P.lineTo(px[e.j],py[e.j]);
 
     if (prog > .34){                                      // travelling signal
       const q = (t*.22 + e.w*3.7) % 1;
       if (q < .95){
-        ctx.fillStyle = `rgba(46,111,255,${(1-q)*a*4})`;
-        ctx.beginPath();
-        ctx.arc(px[e.i]+(px[e.j]-px[e.i])*q, py[e.i]+(py[e.j]-py[e.i])*q, 1.6, 0, 6.283);
-        ctx.fill();
+        const da = (1-q)*a*4;
+        if (da > .01){
+          const db = Math.min(EB-1, (da*EB/.8)|0);
+          const sx0 = px[e.i]+(px[e.j]-px[e.i])*q, sy0 = py[e.i]+(py[e.j]-py[e.i])*q;
+          dotPath[db].moveTo(sx0+1.6, sy0);
+          dotPath[db].arc(sx0, sy0, 1.6, 0, 6.283);
+        }
       }
     }
+  }
+  for (let b=0;b<EB;b++){
+    const a = (b+.5)*EA/EB;
+    ctx.strokeStyle = `rgba(86,200,255,${a.toFixed(3)})`;  ctx.stroke(linePath[b]);
+    ctx.strokeStyle = `rgba(255,255,255,${Math.min(1,a+Math.max(wiring,burst)*.5).toFixed(3)})`;
+    ctx.stroke(hotPath[b]);
+    ctx.fillStyle   = `rgba(46,111,255,${((b+.5)*.8/EB).toFixed(3)})`; ctx.fill(dotPath[b]);
   }
 
   if (integrate && boot.trail > .01) drawTrails(ctx, boot.trail);
 
-  const showLabels = win(prog, .56, .62, .90, .97);
+  // labels belong to the destination, so they arrive with it
+  const showLabels = win(prog, .86, .92, 1.01, 1.02);
   ctx.font = '500 11px Garet, Inter, sans-serif';
-  for (let k=0;k<N;k++){
+  for (const k of order){                                 // far to near
     const age = pAge[k];
-    if (age <= .001) continue;
     const pop = age < .25 ? age*4 : 1;                    // flash-pop at birth
     const core0 = k === 0;
     // nodes near the pointer brighten, so the cloud reacts before it is even touched
@@ -604,23 +818,28 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
       const d = Math.hypot(px[k]-ptr.x, py[k]-ptr.y);
       near = clamp(1 - d/190);
     }
-    const a   = alphaMul * (core0 ? .95 : (.25 + .55*clamp(pf[k]-.6) + .45*near)) * clamp(age*3);
+    const a   = alphaMul * (core0 ? .95 : (.25 + .55*clamp(pf[k]-.6) + .45*near))
+                * clamp(age*3) * fadeOf(k);
     // the core holds a STEADY radius: a pulsing/jittering centre point reads as
     // flicker, not as life
-    const r   = (core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass) * pop;
+    const r   = Math.min((core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass) * pop, 90);
     ctx.fillStyle = `rgba(214,235,255,${a})`;
     ctx.beginPath(); ctx.arc(px[k],py[k],r,0,6.283); ctx.fill();
     ctx.fillStyle = `rgba(86,200,255,${a*.12})`;
     ctx.beginPath(); ctx.arc(px[k],py[k],r*5,0,6.283); ctx.fill();
 
-    if (nodes[k].label && k !== 0 && showLabels > .01 && pf[k] > .85){
+    // near hemisphere only, by real depth. The old pf > .85 test was a proxy for
+    // that; pf is now focal/depth and lands right on .85 here, so it flickered.
+    // Front hemisphere plus a little, by real depth. Labels behind the cloud
+    // would float over it and read as wrong; orbit the network to reach those.
+    if (nodes[k].label && showLabels > .01 && pdep[k] < (cam.z - Z_DEST) + .40){
       ctx.fillStyle = `rgba(46,111,255,${showLabels*.9})`;
       ctx.beginPath(); ctx.arc(px[k],py[k],2.6,0,6.283); ctx.fill();
       ctx.fillStyle = `rgba(255,255,255,${showLabels*.72})`;
       ctx.fillText(nodes[k].label, px[k]+10, py[k]+4);
     }
   }
-  if (integrate){ ppx.set(px.slice(0,N)); ppy.set(py.slice(0,N)); }
+  if (integrate){ ppx.set(px.slice(0,NALL)); ppy.set(py.slice(0,NALL)); }
 
   // shockwaves, off the impact clock so they last the same wall-clock time
   // whether the boot is driving or the user is scrubbing
@@ -642,9 +861,9 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
 // exactly one writer and the depth echo cannot corrupt it
 function drawTrails(ctx, trail){
   ctx.lineWidth = 1;
-  for (let k=1;k<N;k++){
+  for (let k=1;k<NALL;k++){
     const age = pAge[k];
-    if (age <= .02 || age >= .999) continue;        // only nodes actually in flight
+    if (!vis[k] || age <= .02 || age >= .999) continue;   // in flight and on screen
     const dx = px[k]-ppx[k], dy = py[k]-ppy[k], sp = Math.hypot(dx,dy);
     if (sp < 1.2 || sp > 200) continue;             // stale buffer / resize teleport
     ctx.strokeStyle = `rgba(150,205,255,${(Math.min(sp/40,1)*trail*.5).toFixed(3)})`;
@@ -682,6 +901,19 @@ function setScene(el, o, ty, blur, tx){
 let lastChapter = '', tLoad = 0, tClose = 0, tBoot = 0, tCollapse = 0, p = 0, lastGap = 0, tPrev = 0;
 function frame(ms){
   const t = ms/1000;
+
+  // hold everything behind the dots until the page is genuinely ready
+  if (!booted){
+    if (assetsReady && tailwindDone() && ++warmFrames > 3){
+      booted = true;
+      gateReady = true;                 // readiness is already proven; the
+      bootEl.classList.add('gone');     // collision is now a clean timed
+      setTimeout(() => bootEl.remove(), 500);   // animation, not a progress bar
+    } else {
+      requestAnimationFrame(frame);
+      return;
+    }
+  }
   if (!tLoad) tLoad = t;
 
   // ---- LOADER ----------------------------------------------------------
@@ -719,16 +951,7 @@ function frame(ms){
   const bt = tBoot ? t - tBoot : 0;
   const booting = !reduce && tBoot && bt < BOOT.hold;
 
-  // ---- ORBIT: inertia after release, and the auto-spin ramp ----
   const dt = tPrev ? Math.min(t - tPrev, .05) : 1/60; tPrev = t;
-  if (!orbit.dragging){
-    orbit.x += orbit.vx; orbit.vx *= .94;                      // coast, then settle
-    orbit.y = clamp(orbit.y + orbit.vy, -ORBIT_MAX_X, ORBIT_MAX_X); orbit.vy *= .94;
-    orbit.idle += dt;
-  }
-  // auto-spin backs off while the user steers, eases back ~1.6s after release,
-  // so a deliberately posed angle does not drift away from them
-  spin += reduce ? 0 : dt * .045 * clamp((orbit.idle - 1.6)/2);
 
   // ---- BOOT ------------------------------------------------------------
   const boot = reduce ? HOLD : bootProgress(bt);
@@ -758,6 +981,31 @@ function frame(ms){
   if (booting) p = boot;
   else p += (target - p) * (reduce ? 1 : .075);
 
+  // ---- ORBIT: inertia, tunnel bounds, and the auto-spin ramp ----
+  // Runs AFTER p, because the bounds depend on which phase we are in.
+  // In the tunnel the drag aims the camera and there is no subject to keep on
+  // screen, so it is clamped and eases back to centre — that is what stops the
+  // network being lost off the edge of the frame with no way to find it again.
+  const inTunnel = seg(p,.30,.42) * (1 - seg(p,.78,.88)) > .5;
+  if (!orbit.dragging){
+    orbit.x += orbit.vx; orbit.vx *= .94;                      // coast, then settle
+    orbit.y += orbit.vy; orbit.vy *= .94;
+    if (inTunnel){ orbit.x *= .94; orbit.y *= .94; }           // recentre the flight path
+    orbit.idle += dt;
+  }
+  // Hitting a bound must KILL the velocity pushing into it. Without this a hard
+  // fling keeps slamming the clamp every frame and the view sits pinned at the
+  // limit for a second before the spring can win.
+  const bound = (axis, vel, lim) => {
+    if (orbit[axis] > lim){ orbit[axis] = lim; if (orbit[vel] > 0) orbit[vel] = 0; }
+    else if (orbit[axis] < -lim){ orbit[axis] = -lim; if (orbit[vel] < 0) orbit[vel] = 0; }
+  };
+  bound('y','vy', inTunnel ? .40 : ORBIT_MAX_X);
+  if (inTunnel) bound('x','vx', .45);
+  // auto-spin backs off while the user steers, eases back ~1.6s after release,
+  // so a deliberately posed angle does not drift away from them
+  spin += reduce ? 0 : dt * .045 * clamp((orbit.idle - 1.6)/2);
+
   // camera rig: slow pan, blast shake + push-in, pull-back, slow orbit.
   // The pan runs off wall-clock time, not progress, so the frame is never
   // locked — even parked at HOLD the camera keeps breathing.
@@ -774,9 +1022,20 @@ function frame(ms){
   // x-offset reads as a colour fringe without a second render pass
   layers[1].c.style.transform = `translate3d(${(shake*.75).toFixed(2)}px,0,0)`;
 
-  drawNetwork(layers[0].ctx, p, t, 1,     1,  bootState, true);
-  drawNetwork(layers[1].ctx, p, t, 1.045, .8, bootState, false);
-  drawDust(layers[2].ctx, t, bootState);
+  // While the two points are still approaching, the loader overlay is fully
+  // opaque — rendering 1120 nodes and 4427 edges underneath it buys nothing and
+  // steals frames from the one animation the user is actually watching. The
+  // canvas comes alive at the closing rush, well before the overlay fades, so
+  // the atom is already there for the handoff.
+  if (tClose || tBoot){
+    drawNetwork(layers[0].ctx, p, t, 1, 1, bootState, true);
+    // the blurred depth echo is a whole second render; inside, fog already does
+    // the atmospheric work, so fade it out across the dive instead of paying for it
+    const echo = .8 * (1 - seg(p, .30, .45));
+    if (echo > .02) drawNetwork(layers[1].ctx, p, t, 1.045, echo, bootState, false);
+    else layers[1].ctx.clearRect(0,0,W,H);
+    drawDust(layers[2].ctx, t, bootState);
+  }
 
   // the one thing allowed at the pause: the affordance that says scroll
   cue.style.opacity = (booting ? 0 : clamp((bt - BOOT.hold)/.7) * (1-clamp(raw*12))).toFixed(3);
@@ -789,7 +1048,7 @@ function frame(ms){
   const scrolled = clamp(raw*12);
   setScene(scenes[0], win(p,.315,.375,.46,.52)*scrolled, (0.42-p)*160, 0, (0.42-p)*-120);
   setScene(scenes[1], win(p,.52,.58,.65,.70)*scrolled,   (0.61-p)*160, 0, (0.61-p)*120);
-  setScene(scenes[2], win(p,.70,.75,.82,.86)*scrolled,   (0.78-p)*140);
+  setScene(scenes[2], win(p,.70,.75,.82,.86)*scrolled,   (0.78-p)*160, 0, (0.78-p)*-120);
   setScene(scenes[3], win(p,.88,.93,1.01,1.02)*scrolled,  (0.95-p)*90);
 
   // HUD and rail are chrome, not network — they arrive with the first scroll too
@@ -830,5 +1089,12 @@ document.querySelectorAll('.rv').forEach((el,i) => {
   io.observe(el);
 });
 </script>
+
+<!-- Deliberately at the END of body. As blocking <head> scripts these delayed
+     first paint to ~440ms; down here the boot dots are already on screen while
+     Tailwind downloads and compiles behind the overlay. -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = window.__twConfig;</script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </body>
 </html>
