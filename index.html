@@ -596,7 +596,29 @@ const PIVOT_Z = [[0,0],[.35,0],[.80,Z_DEST],[1,Z_DEST]];
 const NEAR = .12, FOG_NEAR = 2.4, FOG_FAR = 7.0, FOCAL_IN = 1.60;
 const EB = 10, EA = .55;                        // edge alpha buckets, and their top of range
 const px=[], py=[], pf=[], pAge=[], pdep=[];
+const pa=new Float32Array(NALL), pr=new Float32Array(NALL); // alpha/radius, shared by both node passes
 let order = [];                                 // visible indices, far to near
+
+// Node bloom as a cached bitmap. Per-node createRadialGradient() would rebuild a
+// gradient object 300+ times a frame, and a constant-alpha disc (the old r*5 arc)
+// never read as glow anyway. One sprite blitted additively has a real falloff.
+//
+// TWO sizes, not one, and this is measured not guessed: almost every node blits at
+// ~11px, and resampling a single 128px sprite down that far cost 15.7ms/frame at
+// the finale against 8.0 for the old arcs. Picking a source close to the target
+// size is what makes it cheap; 128 still has to exist for near nodes, where a 32px
+// source would band on the inner stops.
+const SPRITES = [32, 128].map(SP => {
+  const c = document.createElement('canvas'); c.width = c.height = SP;
+  const s = c.getContext('2d');
+  const g = s.createRadialGradient(SP/2,SP/2,0, SP/2,SP/2,SP/2);
+  g.addColorStop(0,   'rgba(255,255,255,1)');
+  g.addColorStop(.14, 'rgba(200,230,255,.85)');
+  g.addColorStop(.38, 'rgba(86,200,255,.28)');
+  g.addColorStop(1,   'rgba(46,111,255,0)');
+  s.fillStyle = g; s.fillRect(0,0,SP,SP);
+  return c;
+});
 
 // ---- pointer: push the nodes around, springs pull them home ----
 // ---- orbit: drag the whole network, with inertia on release ----
@@ -807,8 +829,13 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
 
   // labels belong to the destination, so they arrive with it
   const showLabels = win(prog, .86, .92, 1.01, 1.02);
-  ctx.font = '500 11px Garet, Inter, sans-serif';
-  for (const k of order){                                 // far to near
+
+  // ---- NODES, pass 1: bloom, additive -----------------------------------
+  // Additive blending is commutative, so this pass needs no depth order at all.
+  // It also computes a/r once into pa/pr for pass 2 to read back — recomputing
+  // there would drift (a reads ptr.active) and show as a core/bloom mismatch.
+  ctx.globalCompositeOperation = 'lighter';
+  for (const k of order){
     const age = pAge[k];
     const pop = age < .25 ? age*4 : 1;                    // flash-pop at birth
     const core0 = k === 0;
@@ -823,10 +850,22 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     // the core holds a STEADY radius: a pulsing/jittering centre point reads as
     // flicker, not as life
     const r   = Math.min((core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass) * pop, 90);
-    ctx.fillStyle = `rgba(214,235,255,${a})`;
-    ctx.beginPath(); ctx.arc(px[k],py[k],r,0,6.283); ctx.fill();
-    ctx.fillStyle = `rgba(86,200,255,${a*.12})`;
-    ctx.beginPath(); ctx.arc(px[k],py[k],r*5,0,6.283); ctx.fill();
+    pa[k] = a; pr[k] = r;
+    const s = Math.min(r*9, 520);                         // uncapped, a near node blits the whole screen
+    if (s < 2.5) continue;                                // the pin already covers it
+    ctx.globalAlpha = Math.min(1, a*1.15);
+    ctx.drawImage(SPRITES[s > 48 ? 1 : 0], px[k]-s/2, py[k]-s/2, s, s);
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+
+  // ---- NODES, pass 2: core pin + labels, painter order -------------------
+  // The pin is what keeps a node a POINT IN SPACE. Bloom alone reads as fog.
+  ctx.font = '500 11px Garet, Inter, sans-serif';
+  for (const k of order){                                 // far to near
+    const a = pa[k], r = pr[k];
+    ctx.fillStyle = `rgba(240,250,255,${a})`;
+    ctx.beginPath(); ctx.arc(px[k],py[k],r*.62,0,6.283); ctx.fill();
 
     // near hemisphere only, by real depth. The old pf > .85 test was a proxy for
     // that; pf is now focal/depth and lands right on .85 here, so it flickered.

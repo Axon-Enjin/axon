@@ -113,6 +113,21 @@ scale_i = age_i < 0.25 ? age_i * 4 : 1          // flash-pop at the instant of b
 
 An edge only draws when **both** endpoints have `age > 0.85`, and its alpha ramps `0 -> 1` over the next `0.04` of progress. Connections must visibly lag behind the births, never appear at the same instant.
 
+### How a node is drawn — "Plasma"
+
+Chosen from six rendered candidates (halo, pin-and-rim, wireframe, terminal glyph, facet, plasma). Two things per node, in **two separate passes over the same projection**:
+
+1. **Bloom** — a pre-rendered radial-gradient sprite (`white -> #c8e6ff -> #56c8ff -> transparent`) blitted at `size = min(r*9, 520)` with `globalCompositeOperation = 'lighter'` and `globalAlpha = min(1, a*1.15)`. Additive is the point: dense regions self-brighten, so the finale's "the connections are the subject" beat comes from the renderer instead of a hand-keyed alpha curve.
+2. **Core pin** — a plain filled arc at `r * 0.62`, `rgba(240,250,255,a)`, `source-over`. **Bloom without the pin reads as fog, not as points in space.** That is what sank the wireframe candidate.
+
+Rules that are not optional:
+
+- **Two sprite sizes, 32px and 128px, picked by target size** (`>48px` takes the big one). Almost every node blits at ~11px, and resampling a single 128px source down that far measured **15.7ms/frame at the finale against 8.0ms for the arcs it replaced**. With the pair it is **7.9ms** — parity. A one-size sprite is the difference between a free win and a 2x regression.
+- **Skip the bloom entirely below 2.5px**; the pin already covers it.
+- **The bloom pass needs no depth sort.** Additive blending is commutative. Only the pin-and-label pass walks `order` far-to-near.
+- **Compute `a` and `r` once, in pass 1, into shared buffers.** `a` reads `ptr.active` and `fadeOf`; recomputing it in pass 2 lets the core and its bloom drift apart.
+- **Restore `globalCompositeOperation` and `globalAlpha` before the pass ends.** Everything after it — labels, shockwaves, dust — inherits whatever is left set, and additive text blows out to white.
+
 Edges are additionally gated on absolute progress by `clamp((p - 0.22) / 0.12)`, so the first connections form late in the main wave and roughly 257 of them exist by `HOLD`. **Do not set that gate at or above `HOLD` (0.30).** It was `clamp((p - 0.30) / 0.06)`, exactly the boot's ceiling, which meant all 491 edges were suppressed for the entire 5s splash — the blast produced scattered dots that never became a network, and the intro read as disconnected from the scroll phase that follows.
 
 ### Camera, per frame
@@ -502,6 +517,7 @@ Reveal these with a single `IntersectionObserver` at `threshold: 0.15`, translat
 - **Do not stroke edges one at a time.** With ~1900 in view that is 32ms/frame on its own. Batch into ~10 quantised-alpha `Path2D` buckets and stroke each once: identical on 1px lines, and it took the finale from **38.8ms to 5.4ms**. Same for the travelling-signal dots.
 - **Do not leave a subject unpinned when drag is active.** Free camera-look loses the network off-frame with no way back. Orbit a pivot wherever there is a subject; clamp and recentre only where there is not.
 - **Do not gate labels on `pf`.** It is `focal/depth` and sits near the threshold at the destination, so labels flicker. Use real depth.
+- **Do not blit one big sprite at every scale.** Scaling a 128px bloom down to the ~11px almost every node needs doubled the finale frame time. Keep a small source and a large one and pick by target size.
 - **Do not leave the core bloom at full scale before the blast.** At full size it is a ~250px soft blob; with nothing else on screen the single atom reads as fog. Scale it to `0.26` and let the blast blow it open.
 - **Do not write effect windows as literal seconds.** Derive them from `BOOT`. `win()` latches on permanently if a retiming inverts its fade-out pair, and the failure looks like a dead sequence rather than a bad number.
 - **Do not gate the edges at or above `HOLD`.** The splash then never becomes a network, which is the single biggest reason the intro can feel disconnected from the scroll phase.
