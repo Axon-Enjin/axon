@@ -1,0 +1,425 @@
+# Build prompt — AXON, "Genesis of a Signal"
+
+Recreate the website **Axon** with high visual fidelity as a Tailwind CSS and Vanilla JavaScript site.
+The result must be a cinematic, scroll-driven creation myth: **one node sparks, multiplies, connects, orbits, and resolves into a living network.** Big bang as brand story. The network *is* the hero asset — there is no hero video.
+
+---
+
+## SOURCE QUIRKS TO PRESERVE
+
+- **There are two clocks, and only one timeline.** The sequence boots on a real-time clock, stops dead at `p = 0.30`, and hands the *same* timeline to scroll. One master value drives everything:
+  ```js
+  const HOLD = 0.30;
+  target = Math.max(bootValue, HOLD + (1 - HOLD) * scrollRatio);
+  p += (target - p) * 0.075;
+  ```
+  Because it is a `max`, the boot can never replay and scroll can never rewind below `HOLD`. Scrolling during the boot simply skips ahead.
+- The entire genesis sequence plays out over a single **`h-[700vh]`** container with one `sticky top-0 h-screen` stage. Every scene is a layer inside that one stage, never a separate scroll section.
+- Nothing is physically simulated. Every node's **final** position is generated once at load; the node animates from the singularity to that final position along an eased path with a per-node delay. Scroll progress is the only clock, so the scene is perfectly scrubbable backwards.
+- The edge list is computed **once**, from final positions, because rotation is rigid and never changes the distance between two nodes. Recomputing pairs per frame is the mistake to avoid.
+- Chapter labels change at hard scroll thresholds: **0.14, 0.34, 0.56, 0.78**.
+- Scroll progress is smoothed with a `lerp` factor of **0.075**. All scene math reads the smoothed value, never the raw one.
+
+---
+
+## CRITICAL FIDELITY CONSTRAINTS
+
+- Palette is **blue and black only**. No warm tones anywhere except the white impact flash.
+  - `--void: #04060d` (page black / cinematic bg)
+  - `--deep: #0a1424` (elevated surfaces, cards)
+  - `--blue: #2e6fff` (primary accent, CTAs, active states)
+  - `--cyan: #56c8ff` (signal pulses, node cores, glows)
+  - `--ice:  #cfe3ff` (body text on dark)
+  - `--white:#ffffff` (headings, impact flash only)
+- Layer stacking is critical: `isolation: isolate` on the stage and `will-change: transform` on the camera rig, or the scene flickers while scrubbing.
+- Atmospheric layers (glow, fog, rays, depth echo) **must** use `mix-blend-mode: screen`, otherwise they render as solid blocks instead of light.
+- The stage must always sit on `#04060d`, never on a gradient, so the screen-blended layers read correctly.
+
+---
+
+## TYPOGRAPHY
+
+- **Title / display: `JamjanNP`** — used only for the wordmark and the single largest hero line.
+- **Headings: `Anton`** — all `h2`/`h3`, uppercase, tight tracking (`-0.02em`), line-height `0.92`.
+- **Body / UI: `Garet`** — all paragraphs, nav, labels, buttons. Weights 300/400/500.
+
+Loading (in this order, and keep the fallbacks — two of these three are not on Google Fonts):
+
+```html
+<!-- Anton: Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<!-- Garet: CDNFonts -->
+<link href="https://fonts.cdnfonts.com/css/garet" rel="stylesheet">
+<!-- JamjanNP: self-host, place the file at ./fonts/JamjanNP.woff2 -->
+<style>
+  @font-face{ font-family:'JamjanNP'; src:url('./fonts/JamjanNP.woff2') format('woff2');
+              font-weight:400; font-display:swap; }
+</style>
+```
+
+Tailwind config:
+
+```js
+fontFamily: {
+  display: ['JamjanNP','Anton','serif'],
+  heading: ['Anton','Impact','sans-serif'],
+  sans:    ['Garet','Inter','system-ui','sans-serif']
+}
+```
+
+Anton has one weight (400) — never apply `font-bold` to it. Garet is the only font allowed to carry small text.
+
+---
+
+## TECH STACK
+
+- Tailwind CSS (CDN: `https://cdn.tailwindcss.com`)
+- Iconify (CDN: `https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js`)
+- Vanilla JS only. No GSAP, no Three.js, no scroll library. One `<canvas>` per visual layer, one `requestAnimationFrame` loop for the whole page.
+
+---
+
+## THE GENESIS ENGINE (Section 1)
+
+### Geometry, generated once at load
+
+```
+N        = 260 nodes
+For each node i:
+  final position = point on a sphere shell, radius 0.55 to 1.0, distributed by
+                   the golden-angle spiral (NOT Math.random on all three axes —
+                   uniform random clumps at the poles and looks like noise)
+  birth   = eased along i, so growth accelerates:  birth_i = (i / N) ** 1.15 * 0.46
+            node 0 has birth 0 and is THE singularity
+            The exponent decides how much mass the blast throws. At 0.62 the
+            first crack births only 23 of 260 and the blast reads as empty;
+            1.15 gives ~52 in the first 150ms and ~180 by the hold.
+  seed    = a stable per-node random, used for drift phase and pulse offset
+```
+
+Edges: for every pair with final distance `< 0.30`, store `{i, j, w: 1 - d/0.30}`. Expect roughly 900 to 1400 edges at N=260 — if you get more than ~2500, lower the threshold, do not lower the frame budget.
+
+### Node life, per frame
+
+```
+age_i   = (i === 0) ? 1 : clamp((p - birth_i) / 0.10)
+pos_i   = lerp(ORIGIN, final_i, easeOutCubic(age_i))
+scale_i = age_i < 0.25 ? age_i * 4 : 1          // flash-pop at the instant of birth
+```
+
+**Node 0 must be hardcoded to `age = 1`.** Derive it from progress and it gets `age = 0` at `p = 0`; the draw loop skips anything at `age <= .001`, so there is no atom on the canvas at all through the twitch and the blast detonates over an empty screen. What looks like an atom in that state is only the CSS core bloom.
+
+`ORIGIN` is dead center, `(0,0,0)`. Every node is born from the same point. That is the whole idea — do not scatter their start positions.
+
+An edge only draws when **both** endpoints have `age > 0.85`, and its alpha ramps `0 -> 1` over the next `0.04` of progress. Connections must visibly lag behind the births, never appear at the same instant.
+
+Edges are additionally gated on absolute progress by `clamp((p - 0.22) / 0.12)`, so the first connections form late in the main wave and roughly 257 of them exist by `HOLD`. **Do not set that gate at or above `HOLD` (0.30).** It was `clamp((p - 0.30) / 0.06)`, exactly the boot's ceiling, which meant all 491 edges were suppressed for the entire 5s splash — the blast produced scattered dots that never became a network, and the intro read as disconnected from the scroll phase that follows.
+
+### Camera, per frame
+
+| Progress | camera Z | behaviour |
+|---|---|---|
+| 0.00 | 0.75 | inside the singularity, the one node fills the screen |
+| 0.14 | 2.20 | violent pull-back as the burst begins |
+| 0.40 | 3.10 | wide, watching the cloud fill out |
+| 0.70 | 2.40 | pushing back in as connections dominate |
+| 1.00 | 2.05 | settled, slow orbit |
+
+Interpolate with `easeInOutCubic` between the keys. Rotation: `rotY = p * 3.6`, `rotX = sin(p * 2.4) * 0.30`. Projection is `f = camZ / (camZ - z)` — a real perspective divide, not a fake 2D scale.
+
+---
+
+## THE LOADER
+
+Axon has no binary assets, so there is nothing heavy to preload — but the site must still perform an introduction on its own clock before it asks the user for anything. The loader is what buys that, and the wait it shows is real: **fonts genuinely block text render**, so it gates on `document.fonts.ready`.
+
+```js
+const MIN_DWELL = 1.2, CAP = 3.0;                     // seconds
+Promise.race([ document.fonts.ready, timeout(CAP) ]).then(() => gateReady = true);
+const shown = Math.min(elapsed / MIN_DWELL, gateReady ? 1 : .92);
+```
+`MIN_DWELL` gives the charge time to read; the `CAP` race means a slow font CDN can never strand anyone. `shown` never claims 100% before the gate clears and never stalls at 0.
+
+Composition — **two points converging on the horizontal centre line**, nothing else. No wordmark, no percentage. The singularity is not a given; it is *caused*, by two things meeting. For an agency named Axon that origin is the thesis.
+
+**The gap is the progress bar**, and the two points move at **one constant speed the whole way in**. No easing on approach, no acceleration at the end, no velocity change as they meet — the motion must read as two objects travelling, not as an animation with a curve on it:
+
+```js
+const FLOOR = 110;                               // hover distance if the gate stalls
+const travelPx = () => innerWidth*.55 + 60;
+// derive the closing duration from the SAME speed the approach uses
+const closeDur = () => FLOOR / ((travelPx() - FLOOR) / MIN_DWELL);
+
+// 1. APPROACH — gate-driven, LINEAR
+const trem = gateReady ? 0 : Math.sin(t*9)*2.5;  // trembles only while stalled
+gap = FLOOR + trem + (1 - shown) * (travelPx() - FLOOR);
+if (shown >= 1) tClose = t;
+
+// 2. CLOSE — time-driven, LINEAR, same px/sec
+gap = FLOOR * (1 - clamp((t - tClose)/closeDur()));
+```
+
+At a 939px viewport both phases run at **389px/s** and the close takes 283ms. Assert that equality after any change to `MIN_DWELL` or `FLOOR` — it is the whole point of deriving `closeDur` rather than hardcoding it.
+
+- **The close must still be its own timed phase.** Driving the final gap off progress closes it in one frame and the points read as *vanishing* rather than colliding.
+- `FLOOR` is now only the stalled-hover distance. It no longer tunes an acceleration, because there is no acceleration. If the gate stalls the points hover with a small tremble; if it never stalls, they simply arrive.
+- Each point trails a **wake**: a `1px` horizontal gradient extending *away* from its direction of travel, length `min(speed*7, 220)px`. Anchor it on the trailing side (`flex` for the left traveller, `flex-row-reverse` for the right) or it renders ahead of the dot. With constant speed the wake is a constant length, which is correct — it is a speed readout.
+- The dots are `9px`, identical to the atom the canvas draws for node 0, because one of them effectively becomes it.
+- Progress also shows as a dim **hairline rail at `bottom-8`, `w-56`** — same geometry as the scroller's rail, so the loading bar becomes the progress rail. Redundant with the gap by design: the gap is atmospheric, the rail is unambiguous.
+
+Contact, no cut: a short white radial pops, the two travellers are hidden, and the atom left behind flares (`scale(1 → 2.6)`, opacity `1 - c²`) over 300ms while the overlay fades over 220ms starting 80ms in. **The boot clock starts at contact**, so the stage atom is already twitching behind the overlay as it dissolves.
+
+**The splash carries no copy whatsoever** — no wordmark, no scroll prompt, no HUD, no rail. Two points meet, the thing detonates, the cloud multiplies into a network, and it waits. Not one word appears until the user scrolls.
+
+---
+
+## THE BOOT SEQUENCE (real clock, autoplays after the loader)
+
+Nothing here is scroll-driven. `bt` is seconds since **contact** — not since the first frame.
+
+Contact → blast → the cloud multiplying is **one unbroken move**. There is no twitch, no charge, no blackout, no stutter beat. Every one of those was a frame that held still between the collision and the expansion, and each one reads as lag:
+
+| Window | Beat | Behaviour |
+|---|---|---|
+| `0.00 – 0.10s` | **CORE** | The merged point sits at centre, steady, `p` pinned at 0. Dust takes a quick inhale toward centre. The core bloom is scaled to `0.26` — at full size it is a ~250px blob and a lone point reads as fog. 100ms, no more: this is a breath, not a beat. |
+| `0.10s` | **BLAST** | Flash (peaks ~0.13), shockwave, camera shake, lens punch, chroma split, dust shoved outward, bloom blows open to full. |
+| `0.10 – 4.60s` | **MULTIPLY** | One continuous `outQuart` expansion. ~12 nodes by 0.15s, 65 by 0.5s, 114 by 1.0s, 180 by the hold. Motion-blur trails live, second shockwave, afterglow decaying. |
+| `> 4.60s` | **HOLD** | `p` parks at exactly `0.30`. ~180 nodes, ~257 edges — **a visible network, not scattered dots**. It drifts, auto-rotates and stays interactive, but goes nowhere. Only the `SCROLL TO CONNECT` cue is on screen. |
+
+Progress curve — **one continuous curve, not a multi-leg one**:
+
+```js
+p = HOLD * outQuart(seg(bt, BOOT.blast, BOOT.hold));
+```
+Every join between legs is a velocity discontinuity. The earlier crack/beat/wave split hitched twice, visibly. A single `outQuart` gives fast-out-of-the-blast and a long settle with nothing in between. Verify it lands on `.300` exactly and is monotonic — a non-monotonic curve makes nodes retreat into the singularity mid-burst.
+
+**The centre point must be perfectly steady** — constant radius, no sine breathing, no jitter. A pulsing or trembling point at the middle of the frame reads as flicker, not as life. Assert zero drift on it across frames.
+
+During the boot, assign `p = bootProgress(bt)` directly. Do **not** run it through the `0.075` lerp: the smoothing blurs a choreography that is already frame-exact, and softens the stutter beat into nothing.
+
+The hold is the whole point: the site finishes its own introduction, then visibly waits. Reaching `HOLD` must feel like a held breath, not a stall — keep the auto-rotation (`rotY += t * 0.045`), the dust drift, and the pointer interaction all live while paused.
+
+`prefers-reduced-motion: reduce`: skip loader and boot entirely, start at `HOLD`, no jitter, no shake, no flashes.
+
+---
+
+## THE IMPACT CLOCK
+
+Impact effects must **not** be keyed to progress. Progress is the only clock in the scroll phase, but during a 2.9s burst a progress-keyed flash stretches with the burst — a 340ms blast becomes 1.5s of fog, and a 117ms blackout becomes unusable. One normalized envelope, fed by whichever clock owns the timeline:
+
+```js
+const ic = booting ? clamp((bt - BOOT.blast) / 1.40)  // absolute seconds: 100ms stays 100ms
+                   : seg(p, .06, .16);                // progress fallback
+```
+
+| Effect | From `ic` | Wall-clock |
+|---|---|---|
+| white flash | `win(ic, 0, .02, .07, .25) * 0.9` | 343ms |
+| camera shake | `ic < .36 ? sin(t*62) * 9 * (1 - ic/.36) : 0` | ~500ms |
+| shockwave 1 | radius `ic * 3000`, alpha `1 - ic` | 1.40s |
+| shockwave 2 | spawns at `ic > .55`, radius `i2 * 2400` | ~630ms |
+| chroma split | `shake * 0.75` px on the depth canvas x | with the shake |
+| lens punch | `win(ic, 0, .02, .06, .34) * .05` added to zoom | ~450ms |
+
+**Every window must be derived from `BOOT`, never written as literal seconds.** `win(v,a,b,c,d)` has no guard against `c > d`: invert that pair and `seg` returns negatives, the fade-out clamps to 0, and the effect latches **on forever**. This actually happened — a retiming left a full-screen blackout window on literals, its fade-out pair inverted, and the curtain dropped mid-sequence and never lifted, blacking out the rest of the intro while the canvas underneath rendered perfectly (36k lit pixels). After any retiming, sweep every envelope across `0 → BOOT.hold` and assert nothing is still opaque after the blast.
+
+One exception, deliberate:
+
+- The `ic` **progress branch is unreachable by scrolling**. Scroll-driven `p` is `HOLD + 0.70 * scrollRatio`, so it spans `[0.30, 1.00]` and can never enter the `0.06–0.16` impact window. The branch exists because it degrades correctly — at any `p ≥ 0.16` it returns 1, meaning "blast finished" — which is exactly what reduce-motion mode needs when it starts at `HOLD`. Do not delete it, and do not expect scrubbing to replay the blast.
+
+---
+
+## ORBIT — THE USER STEERS THE NETWORK
+
+Drag anywhere on the stage to turn the cloud, with inertia on release. This is the signature interaction: the network is not a video of a network, it is an object you can handle.
+
+```js
+const orbit = { x:0, y:0, vx:0, vy:0, dragging:false, idle:99 };
+const ORBIT_MAX_X = 1.15;                  // radians of tilt, short of the poles
+
+// on drag:  orbit.x += dx * .006;  orbit.y = clamp(orbit.y + dy * .004, ±MAX)
+// per frame, released:  orbit.x += orbit.vx;  orbit.vx *= .94;  orbit.idle += dt
+// applied:  ry = p*3.6 + spin + orbit.x        rx = sin(p*2.4)*.30 + orbit.y
+```
+
+- **Bind `pointerdown` to the stage, not the window.** That excludes the nav and every section below it for free, with no hit-testing. Keep an `a,button` guard for the CTA inside the stage — and test `e.target instanceof Element` first, or a synthetic event whose target is `window` throws on `.closest`.
+- **Clamp the vertical tilt** to `±1.15 rad`. Unclamped, a long upward drag rolls the cloud over its pole and the scene turns inside out.
+- **Inertia**: `vx *= .94` coasts for ~78 frames (1.3s) then rests. Momentum is what makes it feel like mass rather than a slider.
+- **Touch must not steal vertical.** Set `touch-action: pan-y` on the stage and ignore `dy` when `pointerType !== 'mouse'`. Horizontal drags orbit, vertical drags scroll the page. Taking both axes on a phone traps the user in the hero.
+- **Suppress node repulsion while dragging** (`K = 0`). The cloud is being turned, not poked; both at once reads as mush.
+- **Auto-spin must be integrated, never `t * rate`.** It ramps down while the user steers and back in ~1.6s after release, and scaling a large `t` by a changing factor jumps the angle by whole radians the instant the factor moves. Accumulate instead: `spin += dt * rate * ramp` — max step measured at 0.043°/frame.
+- `cursor: grab` / `grabbing` on the stage, or the affordance is invisible.
+
+---
+
+## POINTER INTERACTION (hover)
+
+Hovering pushes the nodes around; dragging orbits the whole cloud (above). The nodes are touchable at every stage, including during the hold. Do this in **screen space** with springs — do not add a 3D physics engine.
+
+```
+per node: ox, oy (offset px), vx, vy (velocity)   // Float32Array(N)
+
+repel radius R = 170px
+force      K  = 2.0     (0 while orbiting — the drag owns the pointer)
+
+each frame, ONCE (main canvas pass only):
+  d = distance(projected node, pointer)
+  if d < R:  f = (1 - d/R) * K   applied along (node - pointer)
+  vx = (vx + fx - ox * 0.055) * 0.88      // spring home + damping
+  ox += vx
+
+then, EVERY pass:  px += ox;  py += oy
+```
+
+- Apply the offsets **after** projection and **before** drawing, so edges stretch with the nodes they connect. Edges reading un-offset coordinates is the tell that this was done wrong.
+- Integrate once per frame, not once per canvas. The depth-echo pass must reuse the offsets, never re-integrate them (pass an `integrate` flag).
+- Nodes within `190px` of the pointer brighten (`+0.45` alpha) and grow (`+1.1px` radius) — the cloud reacts *before* contact.
+- A `256px` blue radial `mix-blend-mode: screen` div follows the pointer, `opacity 0.5`, `0.9` and `scale(1.35)` while down.
+- Equilibrium displacement is `K / 0.055` ≈ 36px while hovering. Nodes must always return home; a permanent dent means the spring term is missing.
+- Use `pointer*` events only (never `mouse*`), all `{passive:true}`, so touch drag works without blocking scroll.
+
+---
+
+## SCROLL SEGMENTS
+
+Segments `0.000 – 0.300` are played by the boot. Everything from `0.300` on is scroll.
+
+**The intro shows the network and nothing else. All copy belongs to scroll.** Every scene is keyed *above* `HOLD` and multiplied by an actual-scroll gate, so no text can appear during the boot or at the pause:
+
+```js
+const scrolled = clamp(raw * 12);          // 0 while parked, 1 once the user moves
+setScene(scene, win(p, ...) * scrolled, ...);
+hud.style.opacity = railWrap.style.opacity = scrolled;
+```
+
+Scene windows, all above `0.30`: `[.315 .375 .46 .52]`, `[.52 .58 .65 .70]`, `[.70 .75 .82 .86]`, `[.88 .93 1.01 1.02]`. Verify no two are ever above 0.5 simultaneously; the small copy-free crossovers between them are intended breathing room.
+
+Keying a scene *at* `0.30` is the trap — scroll-driven `p` starts at exactly `HOLD`, so a window that opens at `.17` is already fully open before the user has scrolled a pixel, and the "network only" intro ends with a wall of text sitting on it. The chapter HUD and progress rail are chrome, not network: they arrive with the first scroll too. The only thing permitted at the pause is the `SCROLL TO CONNECT` cue, which fades out as `scrolled` rises.
+
+**0.000 to 0.060 — SINGULARITY.**
+Pure black. One node, centered, radius pulsing `2px to 5px` at ~0.8Hz, with a `blur(18px)` cyan bloom behind it — what the loader's collision left behind. `AXON` resolves in below it in JamjanNP at `clamp(56px, 12vw, 160px)`, letter-spacing `0.32em`, over `bt 0.30 → 1.05s`. Nothing else exists on screen yet.
+
+**0.060 to 0.140 — IGNITION.**
+White `impact-flash` fires (peak opacity 0.85 at p=0.075, gone by 0.11). The single node splits: nodes 1 to 24 launch outward. A shockwave ring expands from center — a stroked circle, radius `(p-0.06)*4200px`, alpha fading to 0. Camera rig shakes: `sin(t*62) * 9px`, damped by distance from p=0.085. Chapter label switches to **IGNITION** at 0.14.
+
+**0.140 to 0.400 — MULTIPLICATION.** *(the boot ends inside this segment, at 0.300)*
+Nodes stream outward continuously. Still almost no edges — this segment must feel like scattering dust, not a network. Left-aligned copy, x from `-120px` to `0`, at **full opacity across 0.24 to 0.34** so it is the frame the hold rests on, out by 0.40:
+> `01 — MULTIPLICATION` (Garet, uppercase, tracking .34em, `--blue`)
+> **ONE SPARK BECOMES A THOUSAND** (Anton)
+> body: "Every product starts as a single idea in one person's head. Then it has to survive contact with everyone else." (Garet)
+
+**0.340 to 0.560 — FIRST CONTACT.**
+The first thing the user's own scroll does is *make connections happen* — edges ignite here and nowhere earlier. Draw order: edges under nodes, always. Edge alpha `w * 0.42 * depthFactor`, stroke `rgba(86,200,255,a)`. The first travelling pulse appears here — a `1.6px` dot moving along each edge at `(t*0.22 + w*3.7) % 1`, colour `--blue`, alpha `(1-q) * a * 4`. Right-aligned copy, visible 0.45 to 0.51:
+> `02 — FIRST CONTACT`
+> **CONNECTION IS THE PRODUCT**
+> body: "Strategy, design, engineering, growth. Four disciplines only matter at the points where they touch."
+
+**0.560 to 0.780 — ORBIT.**
+The cloud is complete and now behaves as one body: rotation continues, camera orbits, a slow `rotate(p*2.4 - 1)deg` on the rig. Six named nodes fade in labels (`Founders, Strategy, Design, Engineering, Growth, Users`) in Garet 11px, drawn on canvas next to the node, only when that node's projected depth `f > 0.85` so labels never render behind the sphere. Centered copy, visible 0.59 to 0.75:
+> `03 — ORBIT`
+> **THE NETWORK HOLDS ITS SHAPE**
+
+**0.780 to 1.000 — ASCENSION.**
+Second impact flash (weaker, 0.55 peak) at 0.795, this one tinted `--blue` not white. All edges flash to white for ~0.03 of progress, then settle. Final centered scene:
+> `04 — ASCENSION`
+> **AXON** (JamjanNP, `clamp(64px,14vw,220px)`)
+> subline in Anton: **EVERY CONNECTION IS A DECISION**
+> CTA pill: `bg-[#2e6fff] text-white`, Garet 500, label "See the work", icon `solar:arrow-right-linear`.
+
+A thin progress rail sits at `bottom-8`, width `224px`, filled in `--cyan` with `box-shadow: 0 0 12px #56c8ff`.
+
+---
+
+## LAYER STACK (bottom to top)
+
+```
+SECTION       relative h-[700vh] bg-[#04060d]
+  STAGE       sticky top-0 h-screen overflow-hidden, isolation:isolate
+    RIG       absolute inset-0, will-change:transform
+      canvas#net     base network, filter: saturate(1.05) contrast(1.06)
+      canvas#depth   same scene at scale 1.045, mix-blend-mode:screen, blur(1.5rem), opacity .55
+    FOG BACK  absolute inset-x-[-15%], radial blue, blur(2.4rem), screen
+    RAYS      conic-gradient, screen, opacity oscillating .25 to .45
+    CORE GLOW radial at center, screen, intensity tied to (1 - p) so the singularity blooms hardest
+    canvas#dust  70 drifting particles, shadowBlur 12, opacity .7
+    FOG FRONT absolute inset-x-[-15%], screen, blur(2.4rem)
+    GRAIN     inline SVG feTurbulence, opacity .16, mix-blend-mode:overlay
+    VIGNETTE  radial, transparent 40% to rgba(0,0,0,.85)
+    z-20      scene copy blocks
+    z-30      final scene + CTA + chapter HUD + progress rail
+    z-40      impact-flash
+```
+
+---
+
+## SECTIONS 2 TO 5 (flat, after the scroller)
+
+- **02 STUDIO** — bg `#04060d`. Grid `0.75fr 1.15fr 0.9fr` at `lg`. Anton heading. Partner strip in Anton at `text-2xl text-white/25`. Rating card on `--deep` with `-space-x-2` stacked avatars and a `+9` chip.
+- **03 WORK** — bg `#04060d`. Three `<article>` cards, `aspect-[4/5]`, images `grayscale transition duration-1000 group-hover:grayscale-0 group-hover:scale-105`.
+- **04 NETWORK** — the team. Cards on `--deep`, each with a `bg-[#2e6fff] text-white` badge top-left of the image, `border-t border-white/10` separator above social links and "View profile".
+- **05 CONTACT** — full-bleed `--deep` panel, `rounded-3xl`, Anton heading, one mailto CTA in `--blue`.
+
+Reveal these with a single `IntersectionObserver` at `threshold: 0.15`, translateY 26px to 0, 0.8s `cubic-bezier(.2,.7,.2,1)`, staggered `(i % 3) * 90ms`. Respect `prefers-reduced-motion: reduce` by disabling the reveal and pinning scroll progress smoothing to 1.
+
+---
+
+## GLOBAL ANIMATION RULES
+
+- ONE `requestAnimationFrame` loop drives everything. No per-element `setInterval`, no CSS scroll-timeline.
+- **Camera pan runs off wall-clock time, never progress**, so the frame is never locked — even parked at `HOLD` the camera keeps breathing. Two summed sines per axis so the drift never looks periodic, plus a slow roll:
+  ```js
+  panX = sin(t*.11)*22 + sin(t*.047)*12;   // ±34px
+  panY = cos(t*.083)*14;
+  roll = sin(t*.062)*.5;                   // degrees, added to the progress rotation
+  ```
+  Keep the amplitude small. This is a handheld-camera suggestion, not a movement — if the viewer notices the pan as motion, it is too big.
+- Read scroll with `getBoundingClientRect()` on the scroller, never a cached `offsetTop`.
+- `p += (raw - p) * 0.075` every frame, and clamp `raw` to `[0,1]`.
+- Canvas sizing: `dpr = Math.min(devicePixelRatio || 1, 2)`, set `canvas.width = w * dpr`, then `ctx.setTransform(dpr,0,0,dpr,0,0)`. Re-run on `resize`.
+- Scene visibility uses a windowing helper, so every scene fades in and out on its own segment:
+  `win(p,a,b,c,d) = min(clamp((p-a)/(b-a)), 1 - clamp((p-c)/(d-c)))`
+- `prefers-reduced-motion`: skip the shake, the flashes and the smoothing; keep the scrub.
+
+---
+
+## COMMON MISTAKES TO AVOID
+
+- **Do not scatter the nodes' start positions.** Every single node begins at exact center. If node 40 starts anywhere else, the big-bang read is gone.
+- **Do not draw edges before their nodes finish being born.** Connections must trail the births by a visible margin.
+- **Do not recompute pair distances per frame.** Rotation is rigid, distances are constant, the edge list is built once.
+- **Do not use `Math.random()` for all three coordinates** — use the golden-angle spiral or the cloud clumps at the poles.
+- **Do not use CSS `filter: blur()` on the main network canvas** — blur the *depth echo* canvas instead, or the frame rate collapses.
+- **Do not omit `mix-blend-mode: screen`** on fog, rays and glow; they will render as opaque grey slabs.
+- **Do not make the boot scroll-driven, and do not let it replay.** The twitch, charge and burst autoplay on a real clock; scroll only owns `p > HOLD`. Combine the two with `Math.max`, never by switching modes with a boolean, or scrolling up will rewind you into the big bang.
+- **Do not let the sequence actually freeze at HOLD.** `p` stops; the scene must not. Rotation, dust and pointer interaction keep running, otherwise the pause reads as a crash.
+- **Do not key impact effects to progress.** A progress-keyed flash stretches with the burst — slow the burst to 2.9s and a 340ms blast becomes 1.5s of fog. Route every impact effect through the single `ic` envelope, and never let both clocks feed it at once.
+- **Do not lerp `p` during the boot.** The smoothing flattens the stutter beat, which is the one thing carrying the sense of scale.
+- **Do not let the loader's two points close all the way on progress alone.** Without the 54px hover floor, a capped or stalled gate parks them ~2px apart and the wait reads as contact. They must visibly *not* have touched yet.
+- **Do not put any copy on the splash.** No wordmark, no scroll prompt, no HUD, no rail until the wave is underway. Text next to the blast splits the attention the blast needs.
+- **Do not close the final gap on progress.** It closes in one frame and the points read as vanishing rather than colliding. The close is its own timed phase — at the same constant speed as the approach.
+- **Do not ease the points' travel.** No acceleration into contact, no deceleration near it. One constant px/sec the whole way, with `closeDur` derived from that speed.
+- **Do not put a held beat between contact and the expansion.** No blackout, no charge, no stutter — each one reads as the sequence stalling. Contact, blast, multiply: one move.
+- **Do not animate the centre point.** No radius sine, no jitter. At the middle of the frame that reads as flicker.
+- **Do not leave the core bloom at full scale before the blast.** At full size it is a ~250px soft blob; with nothing else on screen the single atom reads as fog. Scale it to `0.26` and let the blast blow it open.
+- **Do not write effect windows as literal seconds.** Derive them from `BOOT`. `win()` latches on permanently if a retiming inverts its fade-out pair, and the failure looks like a dead sequence rather than a bad number.
+- **Do not gate the edges at or above `HOLD`.** The splash then never becomes a network, which is the single biggest reason the intro can feel disconnected from the scroll phase.
+- **Do not trust a beat you verified before a retiming.** The envelope maths were all correct here and still produced a black screen, because one stale window was covering a perfectly rendered canvas. After changing any `BOOT` value, sweep every envelope over `0 → BOOT.hold` again.
+- **Do not integrate the pointer springs in both canvas passes.** The depth echo would double every force. Same hazard for the motion-blur trail buffer: exactly one writer, in the main pass.
+- **Do not let trails or the dust shockwave survive the hold.** Both envelopes must reach 0 at `bt = 5.0`, or the pause is full of smears and displaced dust.
+- **Do not apply `font-bold` to Anton** (single weight) and **do not set body copy in Anton or JamjanNP** — Garet carries all text under 20px.
+- **Do not introduce a third hue.** Blue and black, white only for the impact flash.
+
+---
+
+## APPENDIX — REFERENCE BEHAVIOUR (igloo.inc)
+
+Inspected 2026-08-02. What that site actually runs, and the call on each for Axon:
+
+| Their approach | Evidence | Axon |
+|---|---|---|
+| Three.js `r165` + GSAP `3.12.5` | `window.__THREE__ === "165"`, `window.gsapVersions` | **Rejected.** 260 points and ~1000 lines don't need WebGL. Canvas 2D + one rAF loop stays under 30KB with no dependency. |
+| No native scroll at all — `html` and `body` are both `overflow:hidden`, `scrollHeight === innerHeight`; wheel/touch is captured and fed to a virtual scroll value | computed styles + document metrics | **Rejected.** Keeps real scroll (`700vh` + `getBoundingClientRect`), so the page stays keyboard, trackpad, screen-reader and deep-link friendly. The `0.075` lerp already buys the same inertial feel. |
+| Loader gate before anything renders: KTX2/Basis textures, Draco geometry, EXR + MSDF workers, ZSTD wasm | ~40 asset requests, `basis_transcoder.wasm`, `*.ktx2`, `*.drc` | **Adopted in spirit, not in form.** Axon has zero binary assets, so there is nothing to preload — but it keeps the *idea* the loader buys: the site performs an introduction on its own clock before it asks the user for anything. That is what the TWITCH → CHARGE → BURST → HOLD boot is for. |
+| Scene stays in constant motion even when the user is idle | continuous rAF, GSAP tickers | **Adopted.** Auto-rotation, dust drift and pointer springs never stop, including at `HOLD`. |
+
+Not verified: their exact easing curves and scene timings. The site is a full WebGL canvas whose renderer never initialised in the inspection environment, so the timings above are Axon's own, not measured from theirs.

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axon — Every connection is a decision.</title>
+<meta name="description" content="Axon is a product agency. One spark becomes a thousand. Connection is the product.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/garet" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    display: ['JamjanNP','Anton','serif'],
+    heading: ['Anton','Impact','sans-serif'],
+    sans:    ['Garet','Inter','system-ui','sans-serif']
+  },
+  colors: { void:'#04060d', deep:'#0a1424', blue:'#2e6fff', cyan:'#56c8ff', ice:'#cfe3ff' }
+}}}
+</script>
+<style>
+  /* JamjanNP is not on a public CDN — drop the file here, otherwise Anton takes over */
+  @font-face{ font-family:'JamjanNP'; src:url('./fonts/JamjanNP.woff2') format('woff2');
+              font-weight:400; font-display:swap; }
+
+  html{ -webkit-font-smoothing:antialiased; }
+  body{ overflow-x:hidden; background:#04060d; }
+  ::selection{ background:#2e6fff; color:#fff; }
+
+  /* pan-y lets the browser keep vertical scrolling on touch while we take
+     horizontal drags for the orbit — never hijack both axes on a phone */
+  .stage{ isolation:isolate; touch-action:pan-y; cursor:grab; }
+  .stage.grabbing{ cursor:grabbing; }
+  .rig{ will-change:transform; }
+  .depth{ position:absolute; inset:0; mix-blend-mode:screen; filter:blur(1.3rem); opacity:.55; pointer-events:none; }
+  .screenlayer{ position:absolute; mix-blend-mode:screen; pointer-events:none; }
+  .fog{ position:absolute; inset-inline:-15%; filter:blur(2.4rem); mix-blend-mode:screen; pointer-events:none; }
+  .impact-flash{ position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; }
+  #loader{ transition:none; }
+  #loaderWord{ will-change:letter-spacing; }
+  .scene{ will-change:transform,opacity,filter; }
+  .grain{ position:absolute; inset:0; opacity:.16; pointer-events:none; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
+
+  .art{ background-size:cover; background-position:center; }
+  .art-1{ background-color:#050b18; background-image:
+      radial-gradient(70% 60% at 25% 25%, #2e6fffaa, transparent 60%),
+      radial-gradient(60% 70% at 80% 70%, #56c8ff66, transparent 60%); }
+  .art-2{ background-color:#050b18; background-image:
+      radial-gradient(65% 70% at 70% 20%, #56c8ff88, transparent 60%),
+      radial-gradient(70% 60% at 20% 80%, #1b3a8caa, transparent 60%); }
+  .art-3{ background-color:#050b18; background-image:
+      radial-gradient(60% 60% at 50% 15%, #7aa8ff88, transparent 62%),
+      radial-gradient(70% 70% at 30% 85%, #2e6fffaa, transparent 60%); }
+
+  .rv{ opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
+  .rv.in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none;transition:none} }
+</style>
+</head>
+<body class="bg-void font-sans text-ice antialiased">
+
+<!-- ============================ LOADER ============================
+     One atom, charging. The ring collapses into the singularity, so the
+     handoff to the stage is a continuation, never a cut. -->
+<div id="loader" class="fixed inset-0 z-[60] bg-void">
+  <!-- Two points converging on the centre line. The GAP is the progress bar:
+       they physically cannot touch until the gate clears, so the loader needs
+       no counter. Their collision is what creates the singularity. -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div id="gL" class="absolute right-1/2 top-1/2 flex items-center" style="margin-right:-4.5px">
+      <span id="wL" class="h-px" style="width:0;background:linear-gradient(to left, rgba(86,200,255,.65), transparent)"></span>
+      <span class="h-[9px] w-[9px] shrink-0 rounded-full bg-ice shadow-[0_0_18px_6px_rgba(86,200,255,.45)]"></span>
+    </div>
+    <div id="gR" class="absolute left-1/2 top-1/2 flex flex-row-reverse items-center" style="margin-left:-4.5px">
+      <span id="wR" class="h-px" style="width:0;background:linear-gradient(to right, rgba(86,200,255,.65), transparent)"></span>
+      <span class="h-[9px] w-[9px] shrink-0 rounded-full bg-ice shadow-[0_0_18px_6px_rgba(86,200,255,.45)]"></span>
+    </div>
+    <!-- what the collision leaves behind: the atom the stage takes over -->
+    <span id="loaderAtom" class="absolute left-1/2 top-1/2 h-[9px] w-[9px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ice opacity-0 shadow-[0_0_26px_9px_rgba(86,200,255,.5)]"></span>
+    <div id="lflash" class="pointer-events-none absolute inset-0 opacity-0"
+         style="background:radial-gradient(26% 22% at 50% 50%, rgba(255,255,255,.95), rgba(140,190,255,.4) 45%, transparent 72%)"></div>
+  </div>
+  <!-- same geometry as the scroller's rail: the loading bar becomes the progress rail -->
+  <div class="absolute bottom-8 left-1/2 h-px w-56 -translate-x-1/2 bg-white/10">
+    <div id="loaderRail" class="h-px w-0 bg-cyan/70"></div>
+  </div>
+</div>
+
+<!-- ============================== NAV ============================== -->
+<nav class="fixed inset-x-0 top-0 z-50">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-xl">
+      <span class="h-2 w-2 rounded-full bg-cyan shadow-[0_0_12px_#56c8ff]"></span>
+      <span class="font-display text-lg tracking-[.2em] text-white">AXON</span>
+    </div>
+    <div class="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-ice/60 backdrop-blur-xl md:flex">
+      <a href="#studio"  class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Studio</a>
+      <a href="#work"    class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Work</a>
+      <a href="#network" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Network</a>
+    </div>
+    <a href="#contact" class="flex items-center gap-2 rounded-full bg-blue px-5 py-2.5 text-[13px] font-medium text-white transition hover:brightness-110">
+      <iconify-icon icon="solar:phone-linear" class="text-base"></iconify-icon>
+      <span class="hidden sm:inline">Book a call</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ===================== 1. GENESIS SCROLLER ====================== -->
+<section id="scroller" class="relative h-[700vh] bg-void">
+  <div class="stage sticky top-0 h-screen overflow-hidden bg-void">
+
+    <div id="rig" class="rig absolute inset-0">
+      <canvas id="net" class="absolute inset-0 h-full w-full" style="filter:saturate(1.05) contrast(1.06)"></canvas>
+      <canvas id="depth" class="depth h-full w-full"></canvas>
+    </div>
+
+    <div class="fog -top-1/4 h-[90%] opacity-70" style="background:radial-gradient(50% 50% at 32% 58%, rgba(46,111,255,.34), transparent 70%)"></div>
+    <div id="rays" class="screenlayer inset-0 opacity-30" style="background:conic-gradient(from 200deg at 55% 30%, transparent 0deg, rgba(120,180,255,.16) 16deg, transparent 40deg, rgba(46,111,255,.12) 72deg, transparent 98deg)"></div>
+    <div id="core" class="screenlayer inset-0" style="background:radial-gradient(26% 24% at 50% 50%, rgba(86,200,255,.55), transparent 70%)"></div>
+    <canvas id="dust" class="pointer-events-none absolute inset-0 h-full w-full opacity-70"></canvas>
+    <div class="fog bottom-[-20%] h-[80%] opacity-60" style="background:radial-gradient(50% 50% at 68% 42%, rgba(86,200,255,.22), transparent 70%)"></div>
+    <div class="grain"></div>
+    <div class="pointer-events-none absolute inset-0" style="background:radial-gradient(75% 65% at 50% 45%, transparent 40%, rgba(0,0,0,.85) 100%)"></div>
+    <div id="flash" class="impact-flash"></div>
+
+    <!-- chapter HUD — arrives after the blast, so the splash stays clean -->
+    <div id="hud" class="pointer-events-none absolute inset-x-0 top-24 z-30 flex justify-center opacity-0">
+      <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-[11px] uppercase tracking-[.24em] text-ice/70 backdrop-blur-md">
+        <span class="h-1.5 w-1.5 rounded-full bg-cyan"></span>
+        <span id="chapter">Singularity</span>
+      </div>
+    </div>
+
+    <!-- progress rail -->
+    <div id="railWrap" class="pointer-events-none absolute bottom-8 left-1/2 z-30 h-px w-56 -translate-x-1/2 bg-white/15 opacity-0">
+      <div id="rail" class="h-px w-0 bg-cyan shadow-[0_0_12px_#56c8ff]"></div>
+    </div>
+
+    <!-- the sequence holds here until the user scrolls -->
+    <div id="cue" class="pointer-events-none absolute inset-x-0 bottom-20 z-30 flex flex-col items-center gap-2 text-[11px] uppercase tracking-[.34em] text-ice/60 opacity-0">
+      <span>Scroll to connect</span>
+      <iconify-icon icon="solar:arrow-down-linear" class="animate-bounce text-base"></iconify-icon>
+    </div>
+
+    <!-- pointer light -->
+    <div id="cursor" class="screenlayer left-0 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 opacity-0"
+         style="background:radial-gradient(50% 50% at 50% 50%, rgba(46,111,255,.30), transparent 70%)"></div>
+
+    <!-- SCENE 2 — multiplication (the splash carries no copy at all: collision,
+         then detonation, then the first words) -->
+    <div id="s2" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
+      <div class="max-w-xl">
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">01 — Multiplication</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">One spark<br>becomes<br>a thousand</h2>
+        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Every product starts as a single idea in one person's head. Then it has to survive contact with everyone else.</p>
+      </div>
+    </div>
+
+    <!-- SCENE 3 — first contact -->
+    <div id="s3" class="scene pointer-events-none absolute inset-0 z-20 flex items-center justify-end px-8 text-right md:px-20">
+      <div class="max-w-xl">
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">02 — First contact</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Connection<br>is the<br>product</h2>
+        <p class="mt-7 ml-auto max-w-sm text-[15px] leading-relaxed text-ice/55">Strategy, design, engineering, growth. Four disciplines only matter at the points where they touch.</p>
+      </div>
+    </div>
+
+    <!-- SCENE 4 — orbit -->
+    <div id="s4" class="scene pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center">
+      <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — Orbit</p>
+      <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,7vw,96px);line-height:.92;letter-spacing:-.02em">The network<br>holds its shape</h2>
+    </div>
+
+    <!-- SCENE 5 — ascension -->
+    <div id="s5" class="scene pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center">
+      <p class="mb-7 text-[11px] uppercase tracking-[.4em] text-ice/45">04 — Ascension</p>
+      <p class="font-display text-white" style="font-size:clamp(64px,14vw,220px);letter-spacing:.24em;line-height:1;text-indent:.24em">AXON</p>
+      <h2 class="mt-6 font-heading uppercase text-white/90" style="font-size:clamp(18px,2.4vw,32px);letter-spacing:.06em">Every connection is a decision</h2>
+      <a href="#work" class="pointer-events-auto mt-12 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">
+        See the work
+        <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 2. STUDIO ============================ -->
+<section id="studio" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="grid gap-14 lg:grid-cols-[0.75fr_1.15fr_0.9fr]">
+      <div class="rv">
+        <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">The studio</p>
+        <div class="art art-1 mt-8 aspect-[4/5] rounded-2xl"></div>
+      </div>
+
+      <div class="rv">
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">A small network<br>that behaves<br>like a large one</h2>
+        <p class="mt-8 max-w-md text-[15px] leading-relaxed text-ice/55">Twelve senior people, no account layer. Every project runs on a direct path between the person who decides and the person who builds. That is the whole method.</p>
+        <p class="mt-4 max-w-md text-[15px] leading-relaxed text-ice/55">We take on four engagements at a time so nothing waits in a queue.</p>
+        <div class="mt-10 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-white/10 pt-8 font-heading text-2xl uppercase tracking-wide text-white/25">
+          <span>Monocle</span><span>Dezeen</span><span>AD</span><span>Wired</span>
+        </div>
+      </div>
+
+      <div class="rv space-y-6">
+        <div class="rounded-2xl border border-white/10 bg-deep p-7">
+          <div class="flex -space-x-2">
+            <span class="art art-1 block h-9 w-9 rounded-full border-2 border-deep"></span>
+            <span class="art art-2 block h-9 w-9 rounded-full border-2 border-deep"></span>
+            <span class="art art-3 block h-9 w-9 rounded-full border-2 border-deep"></span>
+            <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-deep bg-blue text-[11px] text-white">+9</span>
+          </div>
+          <p class="mt-6 font-heading text-5xl text-white">4.9<span class="text-2xl text-ice/40">/5</span></p>
+          <p class="mt-2 text-[13px] text-ice/45">Average client rating across 60 shipped products.</p>
+        </div>
+        <div class="rounded-2xl border border-white/10 p-7">
+          <iconify-icon icon="solar:users-group-rounded-linear" class="text-2xl text-cyan"></iconify-icon>
+          <p class="mt-4 text-[15px] leading-relaxed text-ice/55">Embedded with your team, in your tools, from week one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= 3. WORK ============================= -->
+<section id="work" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-16 flex flex-wrap items-end justify-between gap-8">
+      <div>
+        <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Selected work</p>
+        <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Systems we wired</h2>
+      </div>
+      <p class="max-w-xs text-[15px] leading-relaxed text-ice/45">Three of the last twelve. The rest stay under NDA until they launch.</p>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-3">
+      <article class="rv group">
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl">
+          <div class="art art-1 h-full w-full grayscale transition duration-1000 group-hover:scale-105 group-hover:grayscale-0"></div>
+        </div>
+        <div class="mt-6 flex items-start justify-between gap-4">
+          <div>
+            <h3 class="font-heading text-2xl uppercase text-white">Meridian Health</h3>
+            <p class="mt-1 text-[13px] text-ice/40">Care platform &nbsp;/&nbsp; 2025</p>
+          </div>
+          <iconify-icon icon="solar:cpu-linear" class="mt-1 text-xl text-cyan"></iconify-icon>
+        </div>
+      </article>
+
+      <article class="rv group">
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl">
+          <div class="art art-2 h-full w-full grayscale transition duration-1000 group-hover:scale-105 group-hover:grayscale-0"></div>
+        </div>
+        <div class="mt-6 flex items-start justify-between gap-4">
+          <div>
+            <h3 class="font-heading text-2xl uppercase text-white">Relay Logistics</h3>
+            <p class="mt-1 text-[13px] text-ice/40">Fleet routing &nbsp;/&nbsp; 2025</p>
+          </div>
+          <iconify-icon icon="solar:gamepad-linear" class="mt-1 text-xl text-cyan"></iconify-icon>
+        </div>
+      </article>
+
+      <article class="rv group">
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl">
+          <div class="art art-3 h-full w-full grayscale transition duration-1000 group-hover:scale-105 group-hover:grayscale-0"></div>
+        </div>
+        <div class="mt-6 flex items-start justify-between gap-4">
+          <div>
+            <h3 class="font-heading text-2xl uppercase text-white">Northwind Bank</h3>
+            <p class="mt-1 text-[13px] text-ice/40">Onboarding &nbsp;/&nbsp; 2024</p>
+          </div>
+          <iconify-icon icon="solar:videocamera-record-linear" class="mt-1 text-xl text-cyan"></iconify-icon>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== 4. NETWORK =========================== -->
+<section id="network" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-16">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">The network</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">The people you<br>actually work with</h2>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-3">
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-5">
+        <div class="art art-1 relative aspect-[5/4] overflow-hidden rounded-xl">
+          <span class="absolute left-4 top-4 rounded-full bg-blue px-3 py-1 text-[11px] font-medium text-white">Strategy</span>
+        </div>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Julian Reis</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Partner, product direction</p>
+        <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-[13px]">
+          <span class="text-ice/40">in &nbsp;/&nbsp; x</span>
+          <a href="#contact" class="text-cyan hover:underline">View profile</a>
+        </div>
+      </div>
+
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-5">
+        <div class="art art-2 relative aspect-[5/4] overflow-hidden rounded-xl">
+          <span class="absolute left-4 top-4 rounded-full bg-blue px-3 py-1 text-[11px] font-medium text-white">Design</span>
+        </div>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Sofia Marchetti</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Design lead, systems</p>
+        <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-[13px]">
+          <span class="text-ice/40">in &nbsp;/&nbsp; x</span>
+          <a href="#contact" class="text-cyan hover:underline">View profile</a>
+        </div>
+      </div>
+
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-5">
+        <div class="art art-3 relative aspect-[5/4] overflow-hidden rounded-xl">
+          <span class="absolute left-4 top-4 rounded-full bg-blue px-3 py-1 text-[11px] font-medium text-white">Engineering</span>
+        </div>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Matteo Alves</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Principal engineer</p>
+        <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-[13px]">
+          <span class="text-ice/40">in &nbsp;/&nbsp; x</span>
+          <a href="#contact" class="text-cyan hover:underline">View profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== 5. CONTACT =========================== -->
+<section id="contact" class="bg-void pb-28 md:pb-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv rounded-3xl border border-white/10 bg-deep px-8 py-24 text-center md:px-16">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Contact</p>
+      <h2 class="mx-auto mt-6 max-w-3xl font-heading uppercase text-white" style="font-size:clamp(32px,5vw,68px);line-height:.94;letter-spacing:-.02em">Got a signal worth amplifying</h2>
+      <p class="mx-auto mt-7 max-w-md text-[15px] leading-relaxed text-ice/50">Tell us what you are building. We reply within one working day, with an opinion attached.</p>
+      <a href="mailto:hello@axon.agency" class="mt-10 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">hello@axon.agency</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-void pb-14">
+  <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 border-t border-white/10 px-6 pt-8 text-[13px] text-ice/40">
+    <span>&copy; 2026 Axon Agency</span>
+    <span>Lisbon &nbsp;/&nbsp; Remote</span>
+  </div>
+</footer>
+
+<script>
+// ======================= genesis engine =======================
+const scroller  = document.getElementById('scroller');
+const rig       = document.getElementById('rig');
+const flash     = document.getElementById('flash');
+const rail      = document.getElementById('rail');
+const rays      = document.getElementById('rays');
+const core      = document.getElementById('core');
+const chapterEl = document.getElementById('chapter');
+const cue       = document.getElementById('cue');
+const cursor    = document.getElementById('cursor');
+const hud       = document.getElementById('hud');
+const railWrap  = document.getElementById('railWrap');
+const scenes    = ['s2','s3','s4','s5'].map(id => document.getElementById(id));
+const reduce    = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const loader    = document.getElementById('loader');
+const loaderAtom= document.getElementById('loaderAtom');
+const loaderRail= document.getElementById('loaderRail');
+const lflash    = document.getElementById('lflash');
+const gL = document.getElementById('gL'), gR = document.getElementById('gR');
+const wL = document.getElementById('wL'), wR = document.getElementById('wR');
+
+// the boot plays on a real clock up to HOLD, then scroll owns the timeline
+const HOLD = .30;
+// Seconds from the moment the two points make contact. Contact -> blast -> the
+// cloud multiplying is ONE unbroken move: no blackout, no charge, no stutter
+// beat. Anything that holds the frame between them reads as lag.
+const BOOT = { blast:0.10, hold:4.60 };
+const IMPACT_SPAN = 1.40;          // seconds the impact envelope covers, from BOOT.blast
+
+// loader gate: fonts genuinely block text render, so this wait is real.
+// MIN_DWELL gives the charge time to read, CAP stops a slow font CDN stranding anyone.
+const MIN_DWELL = 1.2, CAP = 3.0, FLOOR = 110;
+// The two points travel at ONE constant speed the whole way in — no easing on
+// approach, no acceleration at the end. closeDur is derived from that same
+// speed so the final stretch matches it exactly and contact has no velocity
+// change at all.
+// start just INSIDE the edges, never beyond them: at .55*w+60 the points sat
+// off-screen for the first ~275ms and the loader opened on a blank frame
+const travelPx = () => innerWidth*.5 - 30;
+const closeDur = () => FLOOR / ((travelPx() - FLOOR) / MIN_DWELL);
+let gateReady = false;
+Promise.race([ document.fonts.ready, new Promise(r => setTimeout(r, CAP*1000)) ])
+  .then(() => { gateReady = true; });
+
+const clamp = (v,a=0,b=1) => v<a?a:v>b?b:v;
+const seg   = (v,a,b) => clamp((v-a)/(b-a));
+const win   = (v,a,b,c,d) => Math.min(seg(v,a,b), 1-seg(v,c,d));
+const outCubic   = t => 1-Math.pow(1-t,3);
+const outQuart   = t => 1-Math.pow(1-t,4);
+const inOutCubic = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+
+// ONE continuous outQuart from the blast to the hold. Multi-leg curves put a
+// velocity discontinuity at every join — the old crack/beat/wave split visibly
+// hitched twice. Fast out of the blast, long settle, nothing in between.
+function bootProgress(bt){
+  return HOLD * outQuart(seg(bt, BOOT.blast, BOOT.hold));
+}
+
+// place the two travellers at a given separation, wake length from their speed
+function placePoints(gap){
+  gL.style.transform = `translate(${-gap.toFixed(1)}px,-50%)`;
+  gR.style.transform = `translate(${ gap.toFixed(1)}px,-50%)`;
+  const wake = Math.min(Math.abs(gap - lastGap)*7, 220).toFixed(0) + 'px';
+  wL.style.width = wake; wR.style.width = wake;
+  lastGap = gap;
+}
+// piecewise interpolation over [progress, value] keys
+function keyed(p, k){
+  for (let i=0;i<k.length-1;i++){
+    if (p <= k[i+1][0]){
+      const t = inOutCubic(seg(p, k[i][0], k[i+1][0]));
+      return k[i][1] + (k[i+1][1]-k[i][1])*t;
+    }
+  }
+  return k[k.length-1][1];
+}
+
+// ---- geometry: generated once, node 0 is the singularity ----
+const N = 260, LINK = .26;
+const LABEL_AT = {40:'Founders', 80:'Strategy', 120:'Design', 160:'Engineering', 200:'Growth', 240:'Users'};
+const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+const hash = n => { const v = Math.sin(n*12.9898)*43758.5453; return v - Math.floor(v); };
+
+const nodes = Array.from({length:N}, (_,i) => {
+  if (i === 0) return {x:0,y:0,z:0, birth:0, seed:0, label:'Axon'};   // the core, never leaves center
+  // golden-angle azimuth + hashed latitude keeps the shape a ball;
+  // radius tied to index so the cloud grows outward as nodes are born
+  const u = hash(i)*2 - 1, s = Math.sqrt(Math.max(0,1-u*u)), a = GOLDEN*i;
+  const r = .28 + .72*Math.pow(i/N, .55);
+  return { x:Math.cos(a)*s*r, y:u*r, z:Math.sin(a)*s*r,
+           // Exponent controls how much mass the blast actually throws. At .62
+           // the first crack births only 23 of 260 nodes and the screen reads as
+           // empty; 1.15 gives it ~69 up front and ~180 by the hold.
+           birth: Math.pow(i/N, 1.15) * .46,
+           seed: (i*9301+49297) % 233280 / 233280,
+           label: LABEL_AT[i] || null };
+});
+
+const edges = [];
+for (let i=0;i<N;i++) for (let j=i+1;j<N;j++){
+  const a=nodes[i], b=nodes[j];
+  const d = Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z);
+  if (d < LINK) edges.push({i, j, w: 1-d/LINK});
+}
+
+// ---- canvases ----
+const layers = ['net','depth','dust'].map(id => {
+  const c = document.getElementById(id);
+  return { c, ctx: c.getContext('2d') };
+});
+let W=0, H=0;
+function resize(){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  for (const l of layers){
+    l.c.width = W*dpr; l.c.height = H*dpr;
+    l.ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+}
+addEventListener('resize', resize); resize();
+
+const dust = Array.from({length:70}, () => ({
+  x:Math.random(), y:Math.random(), r:.6+Math.random()*1.8,
+  s:.02+Math.random()*.06, a:.15+Math.random()*.5,
+  ox:0, oy:0, vx:0, vy:0                          // pulled in by the charge, thrown by the blast
+}));
+
+const CAM = [[0,.75],[.14,2.20],[.40,3.10],[.70,2.40],[1,2.05]];
+const px=[], py=[], pf=[], pAge=[];
+
+// ---- pointer: push the nodes around, springs pull them home ----
+// ---- orbit: drag the whole network, with inertia on release ----
+const stage = document.querySelector('.stage');
+const orbit = { x:0, y:0, vx:0, vy:0, dragging:false, lx:0, ly:0, touch:false, idle:99 };
+const ORBIT_MAX_X = 1.15;                        // radians of tilt, short of the poles
+let spin = 0;                                    // integrated auto-rotation
+
+const ptr = { x:-9999, y:-9999, down:false, active:false };
+const ox=new Float32Array(N), oy=new Float32Array(N), vx=new Float32Array(N), vy=new Float32Array(N);
+const ppx=new Float32Array(N), ppy=new Float32Array(N);   // previous frame, for motion-blur trails
+addEventListener('pointermove', e => {
+  ptr.x=e.clientX; ptr.y=e.clientY; ptr.active=true;
+  if (!orbit.dragging) return;
+  const dx = e.clientX - orbit.lx, dy = e.clientY - orbit.ly;
+  orbit.lx = e.clientX; orbit.ly = e.clientY;
+  orbit.vx = dx * .006;                          // radians per pixel
+  orbit.x += orbit.vx;
+  if (!orbit.touch){                             // vertical belongs to page scroll on touch
+    orbit.vy = dy * .004;
+    orbit.y = clamp(orbit.y + orbit.vy, -ORBIT_MAX_X, ORBIT_MAX_X);
+  }
+  orbit.idle = 0;
+}, {passive:true});
+
+addEventListener('pointerdown', e => { ptr.x=e.clientX; ptr.y=e.clientY; ptr.down=true; ptr.active=true; },
+                 {passive:true});
+
+// Drag starts on the STAGE only, so the nav and every section below are excluded
+// without needing to test for them. The anchor guard is for the CTA inside it.
+stage.addEventListener('pointerdown', e => {
+  if (e.target instanceof Element && e.target.closest('a,button')) return;
+  orbit.dragging = true; orbit.touch = e.pointerType !== 'mouse';
+  orbit.lx = e.clientX; orbit.ly = e.clientY;
+  orbit.vx = orbit.vy = 0; orbit.idle = 0;
+  stage.classList.add('grabbing');
+}, {passive:true});
+
+const endDrag = () => { ptr.down=false; orbit.dragging=false; stage.classList.remove('grabbing'); };
+addEventListener('pointerup', endDrag, {passive:true});
+addEventListener('pointercancel',() => { endDrag(); ptr.active=false; }, {passive:true});
+addEventListener('pointerout',  e => { if (!e.relatedTarget) ptr.active=false; }, {passive:true});
+
+function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
+  const S    = Math.min(W,H) * .42 * spread;
+  const camZ = keyed(prog, CAM);
+  // `spin` is INTEGRATED, never t * rate: scaling t by a ramping factor makes
+  // the angle jump by whole radians the moment the factor moves
+  const ry = prog*3.6 + spin + orbit.x;
+  const rx = Math.sin(prog*2.4)*.30 + orbit.y;
+  const cy=Math.cos(ry), sy=Math.sin(ry), cx=Math.cos(rx), sx=Math.sin(rx);
+  const burst = win(prog, .78, .795, .805, .83);          // second flash: edges go white
+
+  for (let k=0;k<N;k++){
+    const n = nodes[k];
+    // node 0 is the core: it EXISTS from the first frame. Deriving its age from
+    // progress gives it age 0 at p=0, the draw loop skips it, and the blast then
+    // detonates over an empty screen.
+    const age = k === 0 ? 1 : clamp((prog - n.birth) / .10);
+    const e   = outCubic(age);                            // travel from the singularity outward
+    let x = (n.x*cy + n.z*sy)*e, z = (n.z*cy - n.x*sy)*e;
+    let y = (n.y*cx)*e - z*sx;   z = z*cx + n.y*e*sx;
+    const f = camZ / Math.max(camZ - z, .25);             // perspective, guarded
+    px[k]=W/2 + x*S*f; py[k]=H/2 + y*S*f; pf[k]=f; pAge[k]=age;
+  }
+
+  // integrate the pointer springs once per frame (main pass only), then apply
+  if (integrate && !reduce){
+    // while orbiting, the cloud is being turned, not poked — repulsion off
+    const R = 170, K = orbit.dragging ? 0 : 2.0;
+    for (let k=0;k<N;k++){
+      let fx=0, fy=0;
+      if (ptr.active && K){
+        const dx = px[k]-ptr.x, dy = py[k]-ptr.y, d2 = dx*dx + dy*dy;
+        if (d2 < R*R && d2 > .01){
+          const d = Math.sqrt(d2), f = (1 - d/R)*K;
+          fx = dx/d*f; fy = dy/d*f;
+        }
+      }
+      vx[k] = (vx[k] + fx - ox[k]*.055) * .88;            // spring back + damping
+      vy[k] = (vy[k] + fy - oy[k]*.055) * .88;
+      ox[k]+=vx[k]; oy[k]+=vy[k];
+    }
+  }
+  for (let k=0;k<N;k++){ px[k]+=ox[k]; py[k]+=oy[k]; }    // edges follow, they read px/py
+
+  ctx.clearRect(0,0,W,H);
+  ctx.lineWidth = 1;
+  for (const e of edges){
+    const born = Math.min(pAge[e.i], pAge[e.j]);
+    if (born <= .85) continue;                            // edges trail the births
+    // Edges trail the births, and start appearing late in the main wave — the
+    // old .30 gate was exactly the boot's ceiling, so the whole 5s splash drew
+    // scattered dots and never once became a network.
+    const on = clamp((born - .85) / .04) * clamp((prog - .22) / .12);
+    if (on <= .01) continue;
+    const a = e.w * on * alphaMul * (.12 + .42*clamp((pf[e.i]+pf[e.j])/2 - .6));
+    ctx.strokeStyle = burst > .01 ? `rgba(255,255,255,${a + burst*.5})` : `rgba(86,200,255,${a})`;
+    ctx.beginPath(); ctx.moveTo(px[e.i],py[e.i]); ctx.lineTo(px[e.j],py[e.j]); ctx.stroke();
+
+    if (prog > .34){                                      // travelling signal
+      const q = (t*.22 + e.w*3.7) % 1;
+      if (q < .95){
+        ctx.fillStyle = `rgba(46,111,255,${(1-q)*a*4})`;
+        ctx.beginPath();
+        ctx.arc(px[e.i]+(px[e.j]-px[e.i])*q, py[e.i]+(py[e.j]-py[e.i])*q, 1.6, 0, 6.283);
+        ctx.fill();
+      }
+    }
+  }
+
+  if (integrate && boot.trail > .01) drawTrails(ctx, boot.trail);
+
+  const showLabels = win(prog, .56, .62, .90, .97);
+  ctx.font = '500 11px Garet, Inter, sans-serif';
+  for (let k=0;k<N;k++){
+    const age = pAge[k];
+    if (age <= .001) continue;
+    const pop = age < .25 ? age*4 : 1;                    // flash-pop at birth
+    const core0 = k === 0;
+    // nodes near the pointer brighten, so the cloud reacts before it is even touched
+    let near = 0;
+    if (ptr.active){
+      const d = Math.hypot(px[k]-ptr.x, py[k]-ptr.y);
+      near = clamp(1 - d/190);
+    }
+    const a   = alphaMul * (core0 ? .95 : (.25 + .55*clamp(pf[k]-.6) + .45*near)) * clamp(age*3);
+    // the core holds a STEADY radius: a pulsing/jittering centre point reads as
+    // flicker, not as life
+    const r   = (core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass) * pop;
+    ctx.fillStyle = `rgba(214,235,255,${a})`;
+    ctx.beginPath(); ctx.arc(px[k],py[k],r,0,6.283); ctx.fill();
+    ctx.fillStyle = `rgba(86,200,255,${a*.12})`;
+    ctx.beginPath(); ctx.arc(px[k],py[k],r*5,0,6.283); ctx.fill();
+
+    if (nodes[k].label && k !== 0 && showLabels > .01 && pf[k] > .85){
+      ctx.fillStyle = `rgba(46,111,255,${showLabels*.9})`;
+      ctx.beginPath(); ctx.arc(px[k],py[k],2.6,0,6.283); ctx.fill();
+      ctx.fillStyle = `rgba(255,255,255,${showLabels*.72})`;
+      ctx.fillText(nodes[k].label, px[k]+10, py[k]+4);
+    }
+  }
+  if (integrate){ ppx.set(px.slice(0,N)); ppy.set(py.slice(0,N)); }
+
+  // shockwaves, off the impact clock so they last the same wall-clock time
+  // whether the boot is driving or the user is scrubbing
+  const ic = boot.ic;
+  if (ic > 0 && ic < 1){
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = `rgba(160,210,255,${((1-ic)*.5*alphaMul).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(W/2,H/2, ic*3000, 0, 6.283); ctx.stroke();
+    if (ic > .55){                                  // second, softer wave
+      const i2 = seg(ic,.55,1);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(120,180,255,${((1-i2)*.28*alphaMul).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(W/2,H/2, i2*2400, 0, 6.283); ctx.stroke();
+    }
+  }
+}
+
+// motion-blur trails — main pass only, so the previous-position buffer has
+// exactly one writer and the depth echo cannot corrupt it
+function drawTrails(ctx, trail){
+  ctx.lineWidth = 1;
+  for (let k=1;k<N;k++){
+    const age = pAge[k];
+    if (age <= .02 || age >= .999) continue;        // only nodes actually in flight
+    const dx = px[k]-ppx[k], dy = py[k]-ppy[k], sp = Math.hypot(dx,dy);
+    if (sp < 1.2 || sp > 200) continue;             // stale buffer / resize teleport
+    ctx.strokeStyle = `rgba(150,205,255,${(Math.min(sp/40,1)*trail*.5).toFixed(3)})`;
+    ctx.beginPath(); ctx.moveTo(ppx[k],ppy[k]); ctx.lineTo(px[k],py[k]); ctx.stroke();
+  }
+}
+
+function drawDust(ctx, t, boot){
+  ctx.clearRect(0,0,W,H);
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(86,200,255,.9)';
+  const pull = boot.suck * -2.4 + boot.kick * 14;   // negative = inward
+  for (const d of dust){
+    let y = (d.y - t*d.s*.06) % 1; if (y < 0) y += 1;
+    const bx = d.x*W + Math.sin(t*.4 + d.r*9)*14, by = y*H;
+    if (pull || d.vx || d.ox){
+      const dx = bx + d.ox - W/2, dy = by + d.oy - H/2, dist = Math.hypot(dx,dy) || 1;
+      d.vx = (d.vx + dx/dist*pull - d.ox*.035) * .90;   // same spring pattern as the nodes
+      d.vy = (d.vy + dy/dist*pull - d.oy*.035) * .90;
+      d.ox += d.vx; d.oy += d.vy;
+    }
+    ctx.fillStyle = `rgba(120,180,255,${d.a*.5})`;
+    ctx.beginPath();
+    ctx.arc(bx + d.ox, by + d.oy, d.r, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+}
+
+function setScene(el, o, ty, blur, tx){
+  el.style.opacity = o;
+  el.style.transform = `translate3d(${tx||0}px,${ty}px,0)`;
+  el.style.filter = blur ? `blur(${blur}rem)` : 'none';
+}
+
+let lastChapter = '', tLoad = 0, tClose = 0, tBoot = 0, tCollapse = 0, p = 0, lastGap = 0, tPrev = 0;
+function frame(ms){
+  const t = ms/1000;
+  if (!tLoad) tLoad = t;
+
+  // ---- LOADER ----------------------------------------------------------
+  if (!tBoot){
+    if (reduce){ tBoot = t; loader.style.display = 'none'; }
+    else if (!tClose){
+      // APPROACH — gate-driven. Most of the travel happens over the first 82%,
+      // then they HOVER at a floor, trembling, until the gate actually clears,
+      // so a stalled load reads as "not yet" instead of as contact.
+      const el = t - tLoad;
+      const shown = Math.min(el/MIN_DWELL, gateReady ? 1 : .92);
+      loaderRail.style.width = (shown*100).toFixed(1) + '%';
+      // LINEAR: constant speed, and it only trembles if the gate has stalled
+      const trem = gateReady ? 0 : Math.sin(t*9)*2.5;
+      placePoints(FLOOR + trem + (1-shown) * (travelPx() - FLOOR));
+      if (shown >= 1) tClose = t;
+    } else {
+      // CLOSE — same constant speed as the approach, so there is no velocity
+      // change at the handoff and none as they meet
+      const k = clamp((t - tClose)/closeDur());
+      placePoints(FLOOR * (1 - k));
+      if (k >= 1){ tCollapse = t; tBoot = t; gL.style.display = gR.style.display = 'none'; }
+    }
+  }
+  if (tCollapse){
+    const c = clamp((t - tCollapse)/.30);
+    // the collision pops, then what is left is the atom the stage already draws
+    lflash.style.opacity = (1 - clamp(c/.35)).toFixed(3);
+    loaderAtom.style.opacity   = (1 - c*c).toFixed(3);
+    loaderAtom.style.transform = `translate(-50%,-50%) scale(${(1 + c*1.6).toFixed(3)})`;
+    loader.style.opacity = (1 - clamp((t - tCollapse - .08)/.22)).toFixed(3);
+    if (c >= 1){ loader.style.display = 'none'; tCollapse = 0; }
+  }
+
+  const bt = tBoot ? t - tBoot : 0;
+  const booting = !reduce && tBoot && bt < BOOT.hold;
+
+  // ---- ORBIT: inertia after release, and the auto-spin ramp ----
+  const dt = tPrev ? Math.min(t - tPrev, .05) : 1/60; tPrev = t;
+  if (!orbit.dragging){
+    orbit.x += orbit.vx; orbit.vx *= .94;                      // coast, then settle
+    orbit.y = clamp(orbit.y + orbit.vy, -ORBIT_MAX_X, ORBIT_MAX_X); orbit.vy *= .94;
+    orbit.idle += dt;
+  }
+  // auto-spin backs off while the user steers, eases back ~1.6s after release,
+  // so a deliberately posed angle does not drift away from them
+  spin += reduce ? 0 : dt * .045 * clamp((orbit.idle - 1.6)/2);
+
+  // ---- BOOT ------------------------------------------------------------
+  const boot = reduce ? HOLD : bootProgress(bt);
+
+  // ONE impact clock. Booting reads absolute seconds so 100ms stays 100ms no
+  // matter how long the burst is; scrubbing reads progress so scrolling back
+  // replays the blast. Two sources, one envelope, never both at once.
+  const ic = booting ? clamp((bt - BOOT.blast)/IMPACT_SPAN) : seg(p, .06, .16);
+
+  const bootState = {
+    ic,
+    trail: booting ? win(bt, BOOT.blast, BOOT.blast+.05, BOOT.hold-.6, BOOT.hold) : 0,
+    // young nodes are 2px dots; on an otherwise black screen they need help
+    mass: booting ? 1 + .55*(1 - seg(bt, BOOT.blast, BOOT.hold-.8)) : 1,
+    // every window here is derived from BOOT, never hardcoded seconds: literals
+    // silently invert when the timeline is retimed
+    // a quick inhale in the ~100ms before the blast, then the shove outward
+    suck:  booting ? win(bt, 0, .02, BOOT.blast-.03, BOOT.blast) : 0,
+    kick:  booting ? win(bt, BOOT.blast, BOOT.blast+.02, BOOT.blast+.05, BOOT.blast+.22) : 0
+  };
+
+  // scroll picks the timeline up exactly where the boot parked it
+  const r = scroller.getBoundingClientRect();
+  const raw = clamp(-r.top / (r.height - innerHeight));
+  const target = Math.max(boot, HOLD + (1-HOLD)*raw);
+  // during the boot the choreography is frame-exact; the lerp would blur it
+  if (booting) p = boot;
+  else p += (target - p) * (reduce ? 1 : .075);
+
+  // camera rig: slow pan, blast shake + push-in, pull-back, slow orbit.
+  // The pan runs off wall-clock time, not progress, so the frame is never
+  // locked — even parked at HOLD the camera keeps breathing.
+  const shakeN = (!reduce && ic > 0 && ic < .36) ? 1 - ic/.36 : 0;
+  const shake  = shakeN * Math.sin(t*62) * 9;
+  const panX   = reduce ? 0 : Math.sin(t*.11) * 22 + Math.sin(t*.047) * 12;
+  const panY   = reduce ? 0 : Math.cos(t*.083) * 14;
+  const punch  = win(ic, 0, .02, .06, .34) * .05;      // the blast shoves the lens
+  const zoom   = 1.03 + p*.10 + punch;
+  rig.style.transform =
+    `translate3d(${(-p*30 + panX + shake).toFixed(2)}px, ${(-p*20 + panY + shake*.6).toFixed(2)}px, 0)` +
+    ` scale(${zoom.toFixed(3)}) rotate(${(p*2.4 - 1 + Math.sin(t*.062)*.5).toFixed(2)}deg)`;
+  // chromatic split for free: the depth echo is already screen-blended, so an
+  // x-offset reads as a colour fringe without a second render pass
+  layers[1].c.style.transform = `translate3d(${(shake*.75).toFixed(2)}px,0,0)`;
+
+  drawNetwork(layers[0].ctx, p, t, 1,     1,  bootState, true);
+  drawNetwork(layers[1].ctx, p, t, 1.045, .8, bootState, false);
+  drawDust(layers[2].ctx, t, bootState);
+
+  // the one thing allowed at the pause: the affordance that says scroll
+  cue.style.opacity = (booting ? 0 : clamp((bt - BOOT.hold)/.7) * (1-clamp(raw*12))).toFixed(3);
+  cursor.style.opacity = ptr.active ? (ptr.down ? .9 : .5) : 0;
+  cursor.style.transform = `translate3d(${ptr.x}px,${ptr.y}px,0) translate(-50%,-50%) scale(${ptr.down ? 1.35 : 1})`;
+
+  // The sequence shows the NETWORK AND NOTHING ELSE. Every scene is keyed above
+  // HOLD (0.30) and multiplied by `scrolled`, so no copy can appear until the
+  // user actually scrolls — not during the boot, not at the pause.
+  const scrolled = clamp(raw*12);
+  setScene(scenes[0], win(p,.315,.375,.46,.52)*scrolled, (0.42-p)*160, 0, (0.42-p)*-120);
+  setScene(scenes[1], win(p,.52,.58,.65,.70)*scrolled,   (0.61-p)*160, 0, (0.61-p)*120);
+  setScene(scenes[2], win(p,.70,.75,.82,.86)*scrolled,   (0.78-p)*140);
+  setScene(scenes[3], win(p,.88,.93,1.01,1.02)*scrolled,  (0.95-p)*90);
+
+  // HUD and rail are chrome, not network — they arrive with the first scroll too
+  hud.style.opacity = railWrap.style.opacity = scrolled.toFixed(3);
+
+  // two flashes: white ignition off the impact clock, blue ascension off progress
+  const f1 = win(ic, 0, .02, .07, .25)*.9, f2 = win(p,.78,.795,.805,.83)*.55;
+  flash.style.opacity = Math.max(f1,f2);
+  flash.style.background = f2 > f1
+    ? 'radial-gradient(46% 40% at 50% 50%, rgba(46,111,255,.95), rgba(86,200,255,.35) 42%, transparent 72%)'
+    : 'radial-gradient(40% 34% at 50% 50%, rgba(255,255,255,.98), rgba(140,190,255,.45) 40%, transparent 70%)';
+
+  // Pre-blast the bloom must be a TIGHT halo, or the lone atom reads as fog on
+  // an otherwise empty screen. It blows open with the blast, then the scar it
+  // leaves outlives the flash by ~1.5s.
+  const flare = booting ? .62 * (1 - seg(bt, BOOT.blast+.02, BOOT.blast+1.6)) : 0;
+  const preBlast = booting && bt < BOOT.blast;
+  core.style.transform = `scale(${(booting ? .26 + .74*clamp(ic/.22) : 1).toFixed(3)})`;
+  core.style.opacity = (preBlast ? .55
+    : Math.max(1 - seg(p,0,.30)*.85, flare)).toFixed(3);
+  rays.style.opacity = (.18 + Math.sin(t*.5)*.06 + p*.22).toFixed(3);
+  rail.style.width   = (p*100).toFixed(1) + '%';
+
+  const ch = p < .14 ? 'Singularity' : p < .34 ? 'Multiplication'
+           : p < .56 ? 'First contact' : p < .78 ? 'Orbit' : 'Ascension';
+  if (ch !== lastChapter){ chapterEl.textContent = ch; lastChapter = ch; }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ======================= reveal for flat sections =======================
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold:.15 });
+document.querySelectorAll('.rv').forEach((el,i) => {
+  el.style.transitionDelay = (i%3)*90 + 'ms';
+  io.observe(el);
+});
+</script>
+</body>
+</html>
