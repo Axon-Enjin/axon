@@ -54,7 +54,13 @@ window.__unpin = () => {};
 }
 // If the render loop never reaches the release (a dead gate, a thrown frame), the
 // page must not stay locked forever. Belt and braces, generous by design.
-setTimeout(() => { document.documentElement.classList.remove('locked'); window.__unpin(); }, 12000);
+// Reset the same way the normal release does. Dropping the pin without zeroing
+// the offset dumps the user mid-timeline with whatever scrolling banked up.
+setTimeout(() => {
+  scrollTo(0, 0);
+  window.__unpin();
+  document.documentElement.classList.remove('locked');
+}, 12000);
 window.__twConfig = { theme: { extend: {
   fontFamily: {
     display: ['JamjanNP','Anton','serif'],
