@@ -539,9 +539,8 @@ function keyed(p, k){
 }
 
 // ---- geometry: generated once, node 0 is the singularity ----
-const N = 260, LINK = .26, LINK_CORR = .36, LINK_DEST = .34;
-const D = 300, Z_DEST = -14.8;                  // the network at the end of the tunnel
-const LABELS = ['Founders','Strategy','Design','Engineering','Growth','Users'];
+const N = 260, LINK = .26, LINK_CORR = .36;
+const Z_DEST = -14.8;                           // where the constellation waits
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 const hash = n => { const v = Math.sin(n*12.9898)*43758.5453; return v - Math.floor(v); };
 
@@ -584,31 +583,86 @@ for (let j=0;j<M;j++){
 }
 const NC = nodes.length;                        // ball + corridor
 
-// THE DESTINATION — the network from the opening, waiting at the end of the
-// tunnel. Same generator as the ball on purpose: it has to READ as the thing
-// you started with, only now wired up and named.
-for (let j=0;j<D;j++){
-  const i = NC + j, s0 = j + 11;                // offset the hash so it is not a clone
-  const u = hash(s0)*2 - 1, s = Math.sqrt(Math.max(0,1-u*u)), a = GOLDEN*i;
-  const r = .28 + .72*Math.pow((j+1)/D, .55);
-  nodes.push({
-    x: Math.cos(a)*s*r, y: u*r, z: Z_DEST + Math.sin(a)*s*r,
-    birth: .72,                                 // materialises out of the fog on approach
-    seed: hash(i*3+7),
-    // Six labels on the OUTER shell (high j = large radius), spread apart by the
-    // golden angle. Inner-shell nodes sit too close to the core to read.
-    label: (j >= D-36 && (D-1-j) % 7 === 0) ? LABELS[(D-1-j)/7] : null,
-    grp: 2
+// THE DESTINATION — a constellation of four figures standing with their arms
+// over each other's shoulders, waiting at the end of the tunnel. It replaces the
+// 300-node sphere: 43 stars and 40 lines say the thing the sphere never did.
+//
+// Every joint is placed BY HAND and nothing is mirrored — head heights differ,
+// hips sit off the head axis so the weight shifts onto one leg, knees turn in,
+// ankles cross, one outer arm hangs loose while the other rests on a hip. That
+// asymmetry is the character. A procedural template reads as four cardboard
+// cutouts no matter how many joints you give it.
+const FIG = [
+  { head:[.185,.205], sl:[.145,.300], sr:[.225,.295], hip:[.195,.545],
+    kl:[.155,.700], kr:[.215,.705], fl:[.145,.905], fr:[.225,.900],
+    arm:[[.105,.420],[.125,.545]] },                       // loose, hanging
+  { head:[.405,.165], sl:[.360,.265], sr:[.448,.268], hip:[.405,.525],
+    kl:[.368,.695], kr:[.448,.700], fl:[.352,.915], fr:[.455,.910] },
+  { head:[.600,.205], sl:[.565,.300], sr:[.655,.310], hip:[.625,.555],
+    kl:[.600,.710], kr:[.665,.715], fl:[.590,.905], fr:[.675,.900] },
+  { head:[.830,.185], sl:[.788,.285], sr:[.872,.292], hip:[.822,.540],
+    kl:[.795,.700], kr:[.855,.705], fl:[.808,.905], fr:[.868,.895],
+    arm:[[.925,.400],[.878,.500]] },                       // hand on hip
+];
+const ELBOW = [[.305,.255],[.512,.248],[.727,.262]];       // the arm chain, varied heights
+const MAG = {head:3.0, sl:2.1, sr:2.1, hip:2.2, kl:1.7, kr:1.7, fl:1.9, fr:1.9};
+// Sized so the whole figure fits the frame at the parked camera: heads and feet
+// both inside, nothing cropped. The joint span is y .165 to .915, so it is
+// centred on .54 rather than .50.
+const FIG_W = 2.50, FIG_H = 2.10, FIG_CY = .50;
+const constEdges = [], starId = {};
+{
+  const put = (key, pt, mag) => {
+    starId[key] = nodes.length;
+    nodes.push({
+      x: (pt[0]-.50)*FIG_W, y: (pt[1]-FIG_CY)*FIG_H,
+      // A few hundredths of depth spread, so a drag reads as parallax rather
+      // than as the figure folding up. Flat would be rigid; deep would distort.
+      z: Z_DEST + (hash(nodes.length*5+1)-.5)*.24,
+      birth: 0, seed: hash(nodes.length*3+7), label: null, grp: 2, mag
+    });
+  };
+  FIG.forEach((f,p) => {
+    for (const j of ['head','sl','sr','hip','kl','kr','fl','fr']) put(`${j}${p}`, f[j], MAG[j]);
+    // A neck. Without it the head links straight to both shoulders and the
+    // triangle reads as a pointed hat, and the two torso diagonals cross into an
+    // X through the body. One spine line fixes both.
+    put(`nk${p}`, [(f.sl[0]+f.sr[0])/2, (f.sl[1]+f.sr[1])/2 - .012], 1.6);
+    if (f.arm){ put(`ae${p}`, f.arm[0], 1.7); put(`ah${p}`, f.arm[1], 1.6); }
   });
+  ELBOW.forEach((e,i) => put(`e${i}`, e, 1.8));
+  const L = (a,b) => constEdges.push([starId[a], starId[b]]);
+  FIG.forEach((f,p) => {
+    L(`head${p}`,`nk${p}`);                              // head on a neck
+    L(`nk${p}`,`sl${p}`); L(`nk${p}`,`sr${p}`);           // shoulder bar
+    L(`nk${p}`,`hip${p}`);                               // one spine, no X
+    L(`hip${p}`,`kl${p}`); L(`hip${p}`,`kr${p}`);
+    L(`kl${p}`,`fl${p}`); L(`kr${p}`,`fr${p}`);
+    if (f.arm){ L(p === 0 ? `sl${p}` : `sr${p}`, `ae${p}`); L(`ae${p}`,`ah${p}`); }
+  });
+  for (let p=0;p<3;p++){ L(`sr${p}`,`e${p}`); L(`e${p}`,`sl${p+1}`); }
 }
 const NALL = nodes.length;
+// Draw order is LEFT TO RIGHT, so the figure assembles as a sweep across the
+// frame instead of popping in at random. Stars first, then the lines.
+const starOrder = Array.from({length:NALL-NC}, (_,k) => NC+k)
+  .sort((a,b) => nodes[a].x - nodes[b].x);
+starOrder.forEach((k,rank) => {
+  const r = rank / Math.max(1, starOrder.length-1);
+  nodes[k].rank = r;
+  // Reuse the existing birth machinery rather than inventing a second gate: the
+  // draw loop already ramps `age` over .10 of progress from `birth`.
+  nodes[k].birth = .78 + r*.10;
+});
+constEdges.sort((a,b) => (nodes[a[0]].x+nodes[a[1]].x) - (nodes[b[0]].x+nodes[b[1]].x));
 
 const edges = [];
 for (let i=0;i<NALL;i++){
   const a = nodes[i];
+  if (a.grp === 2) break;                       // the constellation is wired by hand
   // the corridor is sparser than the ball, so it needs a longer reach or the
   // tube never reads as a structure — just loose dots drifting past
-  const lim = a.grp === 0 ? LINK : a.grp === 1 ? LINK_CORR : LINK_DEST, l2 = lim*lim;
+  const lim = a.grp === 0 ? LINK : LINK_CORR, l2 = lim*lim;
   for (let j=i+1;j<NALL;j++){
   // never link across groups: they rotate independently, so a cross-group edge
   // would stretch and swing every frame
@@ -620,6 +674,10 @@ for (let i=0;i<NALL;i++){
   if (d2 < l2) edges.push({i, j, w: 1-Math.sqrt(d2)/lim, grp: a.grp});
   }
 }
+// the constellation's own edges, each carrying its position in the trace order
+constEdges.forEach(([i,j], k) => edges.push({
+  i, j, w: 1, grp: 2, rank: k / Math.max(1, constEdges.length-1)
+}));
 
 // ---- the star field ------------------------------------------------------
 // One static SVG sprite per layer, built once. Percentage coordinates plus
@@ -785,8 +843,10 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
   const ry = prog*3.6 + spin, rx = Math.sin(prog*2.4)*.30;
   const cy=Math.cos(ry), sy=Math.sin(ry), cx=Math.cos(rx), sx=Math.sin(rx);
   const burst  = win(prog, .78, .795, .805, .83);         // second flash: edges go white
-  const destOn = clamp((prog - .84) / .10);               // the destination wiring up
-  const wiring = win(prog, .84, .87, .93, .99);           // and running hot while it does
+  // The constellation draws ITSELF: stars arrive left to right off their birth
+  // ranks, then each line grows from one end to the other in the same order.
+  const traceAt = r => clamp((prog - (.86 + r*.09)) / .035);
+  const wiring = win(prog, .86, .89, .96, 1.0);           // lines run hot while they draw
   // The tunnel recedes once you have arrived. Its last stretch sits between the
   // camera and the destination, so leaving it lit clutters the object you came
   // here to look at.
@@ -881,11 +941,14 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     // scattered dots and never once became a network.
     // the destination wires itself up as you arrive — its nodes are already
     // there, so you watch loose points become a network
-    const gate = e.grp === 2 ? destOn : clamp((prog - .22) / .12);
+    const grow = e.grp === 2 ? traceAt(e.rank) : 1;        // how far this line has drawn
+    const gate = e.grp === 2 ? Math.min(1, grow*3) : clamp((prog - .22) / .12);
     const on = clamp((born - .85) / .04) * gate;
-    if (on <= .01) continue;
+    if (on <= .01 || grow <= .001) continue;
+    // 40 constellation lines have to carry the whole ending, where the sphere had
+    // ~1900 overlapping ones doing it by accumulation. Same formula, more weight.
     const a = e.w * on * alphaMul * (.12 + .42*clamp((pf[e.i]+pf[e.j])/2 - .6))
-              * Math.min(fadeOf(e.i), fadeOf(e.j));
+              * Math.min(fadeOf(e.i), fadeOf(e.j)) * (e.grp === 2 ? 2.4 : 1);
     if (a <= .004) continue;
     const hot = e.grp === 2 ? wiring : burst;              // fresh links run hot, then settle
     // Batch into quantised-alpha buckets instead of stroking each edge. At the
@@ -893,7 +956,9 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     // batched paths are visually identical on 1px lines and a fraction of that.
     const b = Math.min(EB-1, (a*EB/EA)|0);
     const P = hot > .01 ? hotPath[b] : linePath[b];
-    P.moveTo(px[e.i],py[e.i]); P.lineTo(px[e.j],py[e.j]);
+    P.moveTo(px[e.i],py[e.i]);
+    // partial line: the constellation grows each segment from one end to the other
+    P.lineTo(px[e.i]+(px[e.j]-px[e.i])*grow, py[e.i]+(py[e.j]-py[e.i])*grow);
 
     if (prog > .34){                                      // travelling signal
       const q = (t*.22 + e.w*3.7) % 1;
@@ -918,9 +983,6 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
 
   if (integrate && boot.trail > .01) drawTrails(ctx, boot.trail);
 
-  // labels belong to the destination, so they arrive with it
-  const showLabels = win(prog, .86, .92, 1.01, 1.02);
-
   // ---- NODES, pass 1: bloom, additive -----------------------------------
   // Additive blending is commutative, so this pass needs no depth order at all.
   // It also computes a/r once into pa/pr for pass 2 to read back — recomputing
@@ -940,7 +1002,10 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
                 * clamp(age*3) * fadeOf(k);
     // the core holds a STEADY radius: a pulsing/jittering centre point reads as
     // flicker, not as life
-    const r   = Math.min((core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass) * pop, 90);
+    // constellation stars carry a magnitude, so the heads read brighter than the
+    // ankles the way they do on a real chart
+    const mag = nodes[k].mag ? nodes[k].mag / 1.9 : 1;
+    const r   = Math.min((core0 ? 5.2 : pf[k]*(1.5 + near*1.1) * boot.mass * mag) * pop, 90);
     pa[k] = a; pr[k] = r;
     const s = Math.min(r*9, 520);                         // uncapped, a near node blits the whole screen
     if (s < 2.5) continue;                                // the pin already covers it
@@ -950,24 +1015,14 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
 
-  // ---- NODES, pass 2: core pin + labels, painter order -------------------
+  // ---- NODES, pass 2: core pin, painter order ----------------------------
   // The pin is what keeps a node a POINT IN SPACE. Bloom alone reads as fog.
-  ctx.font = '500 11px Garet, Inter, sans-serif';
+  // The constellation carries NO labels, so the whole label pass is gone with the
+  // sphere it belonged to.
   for (const k of order){                                 // far to near
     const a = pa[k], r = pr[k];
     ctx.fillStyle = `rgba(240,250,255,${a})`;
     ctx.beginPath(); ctx.arc(px[k],py[k],r*.62,0,6.283); ctx.fill();
-
-    // near hemisphere only, by real depth. The old pf > .85 test was a proxy for
-    // that; pf is now focal/depth and lands right on .85 here, so it flickered.
-    // Front hemisphere plus a little, by real depth. Labels behind the cloud
-    // would float over it and read as wrong; orbit the network to reach those.
-    if (nodes[k].label && showLabels > .01 && pdep[k] < (cam.z - Z_DEST) + .40){
-      ctx.fillStyle = `rgba(46,111,255,${showLabels*.9})`;
-      ctx.beginPath(); ctx.arc(px[k],py[k],2.6,0,6.283); ctx.fill();
-      ctx.fillStyle = `rgba(255,255,255,${showLabels*.72})`;
-      ctx.fillText(nodes[k].label, px[k]+10, py[k]+4);
-    }
   }
   if (integrate){ ppx.set(px.slice(0,NALL)); ppy.set(py.slice(0,NALL)); }
 
@@ -1125,10 +1180,15 @@ function frame(ms){
   // screen, so it is clamped and eases back to centre — that is what stops the
   // network being lost off the edge of the frame with no way to find it again.
   const inTunnel = seg(p,.30,.42) * (1 - seg(p,.78,.88)) > .5;
+  // The ending is a CONSTELLATION, a figure read flat-on. Free yaw folded it into
+  // an unreadable line of dots, so at the finale the drag is parallax, not orbit:
+  // tightly bounded and springing back to the composed angle.
+  const atFinale = p > .88;
   if (!orbit.dragging){
     orbit.x += orbit.vx; orbit.vx *= .94;                      // coast, then settle
     orbit.y += orbit.vy; orbit.vy *= .94;
     if (inTunnel){ orbit.x *= .94; orbit.y *= .94; }           // recentre the flight path
+    if (atFinale){ orbit.x *= .90; orbit.y *= .90; }           // return to the pose
     orbit.idle += dt;
   }
   // Hitting a bound must KILL the velocity pushing into it. Without this a hard
@@ -1138,8 +1198,9 @@ function frame(ms){
     if (orbit[axis] > lim){ orbit[axis] = lim; if (orbit[vel] > 0) orbit[vel] = 0; }
     else if (orbit[axis] < -lim){ orbit[axis] = -lim; if (orbit[vel] < 0) orbit[vel] = 0; }
   };
-  bound('y','vy', inTunnel ? .40 : ORBIT_MAX_X);
+  bound('y','vy', inTunnel ? .40 : atFinale ? .16 : ORBIT_MAX_X);
   if (inTunnel) bound('x','vx', .45);
+  else if (atFinale) bound('x','vx', .20);
   // auto-spin backs off while the user steers, eases back ~1.6s after release,
   // so a deliberately posed angle does not drift away from them
   spin += reduce ? 0 : dt * .045 * clamp((orbit.idle - 1.6)/2);
