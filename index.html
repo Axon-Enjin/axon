@@ -226,7 +226,10 @@ window.__twConfig = { theme: { extend: {
     </div>
 
     <!-- the sequence holds here until the user scrolls -->
-    <div id="cue" class="pointer-events-none absolute inset-x-0 bottom-20 z-30 flex flex-col items-center gap-2 text-[11px] uppercase tracking-[.34em] text-ice/60 opacity-0">
+    <!-- bottom RIGHT, not centred: scene 1's copy is now up at the pause and it is
+         left-aligned, so a centred cue lands on top of the body paragraph at
+         narrow viewports (measured: cue 272-458px against paragraph 18-402px) -->
+    <div id="cue" class="pointer-events-none absolute bottom-20 right-8 z-30 flex flex-col items-end gap-2 text-[11px] uppercase tracking-[.34em] text-ice/60 opacity-0 md:right-20">
       <span>Scroll to connect</span>
       <iconify-icon icon="solar:arrow-down-linear" class="animate-bounce text-base"></iconify-icon>
     </div>
@@ -1241,11 +1244,18 @@ function frame(ms){
   cursor.style.opacity = ptr.active ? (ptr.down ? .9 : .5) : 0;
   cursor.style.transform = `translate3d(${ptr.x}px,${ptr.y}px,0) translate(-50%,-50%) scale(${ptr.down ? 1.35 : 1})`;
 
-  // The sequence shows the NETWORK AND NOTHING ELSE. Every scene is keyed above
-  // HOLD (0.30) and multiplied by `scrolled`, so no copy can appear until the
-  // user actually scrolls — not during the boot, not at the pause.
+  // Scenes 2 to 4 stay network-only until the user scrolls: keyed above HOLD and
+  // multiplied by `scrolled`, so nothing can appear during the boot.
+  //
+  // Scene 1 is the exception. It is now up as soon as the nodes SETTLE, off the
+  // same post-HOLD clock the scroll cue uses, so the parked frame reads as a
+  // finished statement rather than an empty holding pattern. Its window has to
+  // open BELOW HOLD (.275 to .30) or it would still be shut at the pause — and
+  // `settled` is what keeps it off screen while the boot is still running.
   const scrolled = clamp(raw*12);
-  setScene(scenes[0], win(p,.315,.375,.46,.52)*scrolled, (0.42-p)*160, 0, (0.42-p)*-120);
+  const settled  = booting ? 0 : clamp((bt - BOOT.hold)/.7);
+  setScene(scenes[0], win(p,.275,.30,.46,.52)*Math.max(scrolled, settled),
+           (0.42-p)*160, 0, (0.42-p)*-120);
   setScene(scenes[1], win(p,.52,.58,.65,.70)*scrolled,   (0.61-p)*160, 0, (0.61-p)*120);
   setScene(scenes[2], win(p,.70,.75,.82,.86)*scrolled,   (0.78-p)*160, 0, (0.78-p)*-120);
   setScene(scenes[3], win(p,.88,.93,1.01,1.02)*scrolled,  (0.95-p)*90);
