@@ -446,20 +446,48 @@ A thin progress rail sits at `bottom-8`, width `224px`, filled in `--cyan` with 
 ```
 SECTION       relative h-[700vh] bg-[#04060d]
   STAGE       sticky top-0 h-screen overflow-hidden, isolation:isolate
+    #sky      THE SKY, behind everything. Static, composited once. See below.
+      i x2         star sprites at fixed opacity .8 / .55
     RIG       absolute inset-0, will-change:transform
       canvas#net     base network, filter: saturate(1.05) contrast(1.06)
       canvas#depth   same scene at scale 1.045, mix-blend-mode:screen, blur(1.5rem), opacity .55
-    FOG BACK  absolute inset-x-[-15%], radial blue, blur(2.4rem), screen
-    RAYS      conic-gradient, screen, opacity oscillating .25 to .45
+    RAYS      conic-gradient, screen, opacity oscillating .06 to .20
     CORE GLOW radial at center, screen, intensity tied to (1 - p) so the singularity blooms hardest
     canvas#dust  70 drifting particles, shadowBlur 12, opacity .7
-    FOG FRONT absolute inset-x-[-15%], screen, blur(2.4rem)
     GRAIN     inline SVG feTurbulence, opacity .16, mix-blend-mode:overlay
-    VIGNETTE  radial, transparent 40% to rgba(0,0,0,.85)
+    VIGNETTE  radial, rgba(4,6,13,0) 46% to rgba(0,0,0,.55)
     z-20      scene copy blocks
     z-30      final scene + CTA + chapter HUD + progress rail
     z-40      impact-flash
 ```
+
+### THE SKY ("Abyss")
+
+Four background layers on one `#sky` div plus two star sprites. Genshin-style
+constellation field: near black, violet band rising from the bottom left, a cold
+blue counterweight high right, `feTurbulence` nebula, sparse stars with four-point
+glints.
+
+Two rules are the entire fix for "no colour blending":
+
+- **Every falloff ends at `rgba(4,6,13,0)`, never the `transparent` keyword.** CSS
+  interpolates toward transparent *black*, so a glow ending at `transparent` gets
+  darker as it fades and leaves a visible termination ring. Matching the void's RGB
+  at alpha 0 dissolves instead. This one substitution killed the hard navy blob.
+- **The base ramp carries four stops.** Two glows on flat `#04060d` have no
+  mid-tones to meet in. The ramp is what they blend into.
+
+Plus: `feTurbulence` at `baseFrequency .007` breaks up the ramps, because smooth
+gradients band at 8 bits and smooth clouds do not. The `feColorMatrix` flattens RGB
+to a fixed violet and drives **alpha** from the noise, so it is a tinted cloud with
+holes, not grey static. The `-.40` alpha bias is the contrast knob.
+
+Stars: one seeded SVG sprite per layer, built once at load, percentage coordinates
+plus `background-size:cover` so a resize needs no regeneration. Seed off a
+constant, never `Math.random()` — a field that reshuffles between visits reads as a
+glitch. The four-point glints are the constellation tell; without them it is noise.
+
+**Do not animate anything inside the stage.** See COMMON MISTAKES.
 
 ---
 
@@ -517,6 +545,8 @@ Reveal these with a single `IntersectionObserver` at `threshold: 0.15`, translat
 - **Do not stroke edges one at a time.** With ~1900 in view that is 32ms/frame on its own. Batch into ~10 quantised-alpha `Path2D` buckets and stroke each once: identical on 1px lines, and it took the finale from **38.8ms to 5.4ms**. Same for the travelling-signal dots.
 - **Do not leave a subject unpinned when drag is active.** Free camera-look loses the network off-frame with no way back. Orbit a pivot wherever there is a subject; clamp and recentre only where there is not.
 - **Do not gate labels on `pf`.** It is `focal/depth` and sits near the threshold at the destination, so labels flicker. Use real depth.
+- **Do not CSS-animate anything inside `.stage`, not even pure opacity.** The stage is `isolation:isolate` and holds several `mix-blend-mode:screen` children, and a blended group must re-rasterise whenever anything beneath it changes. A two-layer star twinkle on nothing but `opacity` measured **32.05ms/frame against 12.28ms with it off, and 12.06ms with the sky deleted entirely** — the sky is free, animating it cost 20ms. Live motion belongs on a canvas layer that is already redrawing.
+- **Do not end a gradient stop at the `transparent` keyword.** It interpolates toward transparent black, so the glow darkens as it fades and leaves a termination ring. Use the backdrop colour at alpha 0.
 - **Do not blit one big sprite at every scale.** Scaling a 128px bloom down to the ~11px almost every node needs doubled the finale frame time. Keep a small source and a large one and pick by target size.
 - **Do not leave the core bloom at full scale before the blast.** At full size it is a ~250px soft blob; with nothing else on screen the single atom reads as fog. Scale it to `0.26` and let the blast blow it open.
 - **Do not write effect windows as literal seconds.** Derive them from `BOOT`. `win()` latches on permanently if a retiming inverts its fade-out pair, and the failure looks like a dead sequence rather than a bad number.

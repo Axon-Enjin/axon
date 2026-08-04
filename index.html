@@ -55,7 +55,35 @@ window.__twConfig = { theme: { extend: {
   .rig{ will-change:transform; }
   .depth{ position:absolute; inset:0; mix-blend-mode:screen; filter:blur(1.3rem); opacity:.55; pointer-events:none; }
   .screenlayer{ position:absolute; mix-blend-mode:screen; pointer-events:none; }
-  .fog{ position:absolute; inset-inline:-15%; filter:blur(2.4rem); mix-blend-mode:screen; pointer-events:none; }
+  /* The sky. Static, composited once, no per-frame cost.
+     Two rules do all the work:
+     - every falloff ends at rgba(4,6,13,0), never `transparent`. CSS interpolates
+       toward transparent BLACK, so a glow ending at `transparent` darkens on its
+       way out and leaves a visible termination ring. Matching the void's RGB at
+       alpha 0 makes it dissolve instead.
+     - the base ramp carries four stops. The mid-tones are what the glows blend
+       INTO; two glows on flat black have nothing to meet in. */
+  #sky{ position:absolute; inset:0; pointer-events:none;
+    background-repeat:no-repeat;
+    background-image:
+      radial-gradient(130% 70% at 24% 96%, rgba(84,58,164,.22) 0%,
+                      rgba(38,26,86,.11) 34%, rgba(4,6,13,0) 74%),
+      radial-gradient(70% 55% at 76% 8%, rgba(46,84,150,.14) 0%, rgba(4,6,13,0) 70%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.007' numOctaves='5' seed='13'/%3E%3CfeColorMatrix values='0 0 0 0 .26 0 0 0 0 .20 0 0 0 0 .54 .48 .24 0 0 -.40'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23c)'/%3E%3C/svg%3E"),
+      linear-gradient(176deg, #08061a 0%, #070616 30%, #050510 62%, #04060d 100%);
+    background-size:auto,auto,150% 150%,auto;
+    background-position:0 0,0 0,50% 40%,0 0; }
+  /* Two star sprites at fixed opacity, for density variation. DO NOT ANIMATE THEM.
+     `.stage` is `isolation:isolate` and holds several mix-blend-mode:screen
+     children, so a blended group must re-rasterise whenever anything under it
+     changes — even a pure-opacity keyframe. Measured: twinkle on 32.05ms/frame,
+     off 12.28ms, sky deleted entirely 12.06ms. The stars are free; animating them
+     costs 20ms. Live sparkle belongs on the #dust canvas, which already moves. */
+  #sky i{ position:absolute; inset:0; display:block; background-repeat:no-repeat;
+          background-size:cover; background-position:center; }
+  #sky i:nth-child(1){ opacity:.8; }
+  #sky i:nth-child(2){ opacity:.55; }
+
   .impact-flash{ position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; }
   #loader{ transition:none; }
   #loaderWord{ will-change:letter-spacing; }
@@ -134,18 +162,23 @@ window.__twConfig = { theme: { extend: {
 <section id="scroller" class="relative h-[1000vh] bg-void">
   <div class="stage sticky top-0 h-screen overflow-hidden bg-void">
 
+    <!-- the sky sits BEHIND the rig: the node canvas is transparent except where
+         it draws, so the network reads as being in this sky, not over it -->
+    <div id="sky"><i></i><i></i></div>
+
     <div id="rig" class="rig absolute inset-0">
       <canvas id="net" class="absolute inset-0 h-full w-full" style="filter:saturate(1.05) contrast(1.06)"></canvas>
       <canvas id="depth" class="depth h-full w-full"></canvas>
     </div>
 
-    <div class="fog -top-1/4 h-[90%] opacity-70" style="background:radial-gradient(50% 50% at 32% 58%, rgba(46,111,255,.34), transparent 70%)"></div>
     <div id="rays" class="screenlayer inset-0 opacity-30" style="background:conic-gradient(from 200deg at 55% 30%, transparent 0deg, rgba(120,180,255,.16) 16deg, transparent 40deg, rgba(46,111,255,.12) 72deg, transparent 98deg)"></div>
     <div id="core" class="screenlayer inset-0" style="background:radial-gradient(26% 24% at 50% 50%, rgba(86,200,255,.55), transparent 70%)"></div>
     <canvas id="dust" class="pointer-events-none absolute inset-0 h-full w-full opacity-70"></canvas>
-    <div class="fog bottom-[-20%] h-[80%] opacity-60" style="background:radial-gradient(50% 50% at 68% 42%, rgba(86,200,255,.22), transparent 70%)"></div>
     <div class="grain"></div>
-    <div class="pointer-events-none absolute inset-0" style="background:radial-gradient(75% 65% at 50% 45%, transparent 40%, rgba(0,0,0,.85) 100%)"></div>
+    <!-- seats the frame, does not erase the corners: at .85 from 40% the old
+         vignette crushed the space between the glows to black, and nothing can
+         blend across a black gap -->
+    <div class="pointer-events-none absolute inset-0" style="background:radial-gradient(78% 68% at 50% 44%, rgba(4,6,13,0) 46%, rgba(0,0,0,.55) 100%)"></div>
     <div id="flash" class="impact-flash"></div>
 
     <!-- chapter HUD — arrives after the blast, so the splash stays clean -->
@@ -555,6 +588,33 @@ for (let i=0;i<NALL;i++){
   const dx=a.x-b.x, dy=a.y-b.y, dz=a.z-b.z, d2 = dx*dx+dy*dy+dz*dz;
   if (d2 < l2) edges.push({i, j, w: 1-Math.sqrt(d2)/lim, grp: a.grp});
   }
+}
+
+// ---- the star field ------------------------------------------------------
+// One static SVG sprite per layer, built once. Percentage coordinates plus
+// background-size:cover means a resize needs no regeneration — never rebuild
+// these on resize, and never seed them off Math.random(): a field that
+// reshuffles between visits reads as a glitch, not as sky.
+function starField(seed, n, glints, tint){
+  let s = seed, out = '';
+  const r = () => (s = Math.sin(s*127.1+311.7)*43758.5453, s - Math.floor(s));
+  for (let i=0;i<n;i++)
+    out += `%3Ccircle cx='${(r()*100).toFixed(2)}%25' cy='${(r()*100).toFixed(2)}%25'`
+         + ` r='${(.28+r()*.62).toFixed(2)}' fill='%23fff' opacity='${(.2+r()*.62).toFixed(2)}'/%3E`;
+  // the four-point glints are the constellation tell — without them it is noise
+  for (let i=0;i<glints;i++){
+    const x = (r()*100).toFixed(2), y = (r()*100).toFixed(2), g = (1.6+r()*2.4);
+    out += `%3Ccircle cx='${x}%25' cy='${y}%25' r='${(g*.34).toFixed(2)}' fill='${tint}' opacity='.95'/%3E`
+         + `%3Cellipse cx='${x}%25' cy='${y}%25' rx='${(g*2.8).toFixed(2)}' ry='.5' fill='${tint}' opacity='.42'/%3E`
+         + `%3Cellipse cx='${x}%25' cy='${y}%25' rx='.5' ry='${(g*2.8).toFixed(2)}' fill='${tint}' opacity='.42'/%3E`;
+  }
+  return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'`
+       + ` width='900' height='560'%3E${out}%3C/svg%3E")`;
+}
+{
+  const tw = document.querySelectorAll('#sky i');
+  tw[0].style.backgroundImage = starField(44, 150, 4, '%23dfe9ff');
+  tw[1].style.backgroundImage = starField(91,  90, 2, '%23cbdcff');
 }
 
 // ---- canvases ----
@@ -1108,7 +1168,9 @@ function frame(ms){
   core.style.transform = `scale(${(booting ? .26 + .74*clamp(ic/.22) : 1).toFixed(3)})`;
   core.style.opacity = (preBlast ? .55
     : Math.max(1 - seg(p,0,.30)*.85, flare)).toFixed(3);
-  rays.style.opacity = (.18 + Math.sin(t*.5)*.06 + p*.22).toFixed(3);
+  // halved: screen blending now has a nebula under it, not black, so the same
+  // number reads twice as strong and fights the sky
+  rays.style.opacity = (.09 + Math.sin(t*.5)*.03 + p*.11).toFixed(3);
   rail.style.width   = (p*100).toFixed(1) + '%';
 
   const ch = p < .14 ? 'Singularity' : p < .34 ? 'Multiplication'
