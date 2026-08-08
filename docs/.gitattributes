@@ -1,0 +1,5 @@
+# Keep line endings stable across Windows editors and Google Docs re-exports.
+# Without this, a re-export or a different editor rewrites every line and the
+# diff stops being useful for reviewing actual content changes.
+* text=auto eol=lf
+*.md text eol=lf

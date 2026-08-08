@@ -1,0 +1,18 @@
+# Intermediates. Deliverables belong in the repo or in Drive, never here.
+.tmp/
+*.bak
+*.tmp
+~$*
+
+# OS / editor cruft
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# Never commit credentials
+.env
+.env.*
+credentials.json
+token.json
