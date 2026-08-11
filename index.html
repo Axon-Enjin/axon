@@ -117,8 +117,7 @@ window.__twConfig = { theme: { extend: {
 
   .impact-flash{ position:absolute; inset:0; z-index:46; pointer-events:none; opacity:0; }
   #loader{ transition:none; }
-  #loaderWord{ will-change:letter-spacing; }
-  .scene{ will-change:transform,opacity,filter; }
+  .scene{ will-change:transform,opacity; }
   .grain{ position:absolute; inset:0; opacity:.16; pointer-events:none; mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
 
@@ -137,6 +136,31 @@ window.__twConfig = { theme: { extend: {
   .rv.in{ opacity:1; transform:none; }
   @media (prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none;transition:none} }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ---- QUALITY TIERS -----------------------------------------------------
+     `data-tier` is written on <html> by the engine (see the TIER block in the
+     script). Tiers 3 and 2 keep every layer and only spend fewer pixels, so
+     they need no CSS at all. Tiers 1 and 0 flatten the compositing stack,
+     which is the part a weak GPU actually chokes on:
+       - .depth is a full-viewport canvas under filter:blur(1.3rem) AND
+         mix-blend-mode:screen. Hiding it removes a blur, a blend layer and
+         (in JS) a whole second render of every node and edge.
+       - .grain is a full-viewport mix-blend-mode:overlay.
+       - the nav and HUD backdrop-filters sit over a canvas that repaints every
+         frame, so they re-sample every frame. A flat fill reads nearly the same
+         over the void and costs nothing.
+     Selectors are prefixed with html[data-tier] so they outrank Tailwind's
+     utilities no matter which order the Play CDN injects them in. */
+  html[data-tier="1"] .depth,
+  html[data-tier="0"] .depth,
+  html[data-tier="1"] .grain,
+  html[data-tier="0"] .grain{ display:none; }
+  html[data-tier="1"] .backdrop-blur-xl, html[data-tier="0"] .backdrop-blur-xl,
+  html[data-tier="1"] .backdrop-blur-md, html[data-tier="0"] .backdrop-blur-md{
+    -webkit-backdrop-filter:none; backdrop-filter:none; background-color:rgba(11,16,30,.82); }
+  /* the bounce runs forever on the scroll cue; on a weak device that is a
+     permanent compositor job for an affordance that only reads once */
+  html[data-tier="0"] .animate-bounce{ animation:none; }
 </style>
 </head>
 <body class="bg-void font-sans text-ice antialiased">
@@ -226,7 +250,9 @@ window.__twConfig = { theme: { extend: {
 
     <!-- progress rail -->
     <div id="railWrap" class="pointer-events-none absolute bottom-8 left-1/2 z-30 h-px w-56 -translate-x-1/2 bg-white/15 opacity-0">
-      <div id="rail" class="h-px w-0 bg-cyan shadow-[0_0_12px_#56c8ff]"></div>
+      <!-- full width, scaled from the left: `width` in % is a layout property and
+           this bar is written every single frame of the scroll. scaleX is not. -->
+      <div id="rail" class="h-px w-full origin-left bg-cyan shadow-[0_0_12px_#56c8ff]" style="transform:scaleX(0)"></div>
     </div>
 
     <!-- the sequence holds here until the user scrolls -->
@@ -573,7 +599,53 @@ const cursor    = document.getElementById('cursor');
 const hud       = document.getElementById('hud');
 const railWrap  = document.getElementById('railWrap');
 const scenes    = ['s2','s3','s4','s5'].map(id => document.getElementById(id));
-const reduce    = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let   reduce    = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---- QUALITY TIERS ---------------------------------------------------------
+// This stage renders ~880 nodes and ~4400 edges across three full-viewport
+// canvases into a five-layer screen-blended stack. That is a desktop budget.
+// TIER decides how much of it a given device actually pays for:
+//   3 everything            2 same look, fewer pixels
+//   1 flattened layers      0 reduced-motion path, cheapest render
+// The hints are guesses — deviceMemory is Chromium-only and plenty of Android
+// midrange reports 8 cores it cannot sustain — so they only pick a STARTING
+// point. The frame-time watchdog in frame() is what corrects a bad guess.
+const DBG = /[?&]debug\b/.test(location.search);
+let TIER = (() => {
+  const forced = /[?&]tier=([0-3])/.exec(location.search);   // for QA, see plan
+  if (forced) return +forced[1];
+  if (reduce) return 0;
+  const mem = navigator.deviceMemory || 4, cpu = navigator.hardwareConcurrency || 4;
+  const coarse = matchMedia('(pointer:coarse)').matches;
+  if (mem <= 2 || cpu <= 2) return 0;
+  if (mem <= 4 || cpu <= 4) return coarse ? 1 : 2;
+  return coarse ? 2 : 3;
+})();
+// Everything the render loop reads. Recomputed whenever the watchdog steps down,
+// so nothing here may change the GEOMETRY — the typed arrays and the edge list
+// are sized once against NALL and cannot be rebuilt mid-flight. Node counts are
+// therefore boot-only decisions (see M below).
+const Q = { dpr:2, echo:true, signals:true, trails:true, dust:70 };
+function applyTier(){
+  Q.dpr     = TIER >= 3 ? 2 : TIER === 2 ? 1.5 : TIER === 1 ? 1 : .75;
+  Q.echo    = TIER >= 2;                    // the blurred second render pass
+  Q.signals = TIER >= 3;                    // travelling dots: up to 4400 arcs
+  Q.trails  = TIER >= 3;
+  Q.dust    = TIER >= 3 ? 70 : TIER === 2 ? 40 : TIER === 1 ? 24 : 12;
+  // Tier 0 IS the reduced-motion path — the cheapest render on the page, already
+  // written and already tested. It kills the loader, the camera pan, the blast
+  // shake, the auto-spin and the pointer springs, and snaps `p` instead of
+  // lerping it. Set here rather than at boot so a watchdog step-down to 0 lands
+  // in exactly the same state as a device that started there.
+  if (TIER === 0) reduce = true;
+  document.documentElement.dataset.tier = TIER;   // drives the CSS tier rules
+  if (DBG) console.log('[axon] tier', TIER, Q);
+}
+applyTier();
+// The depth echo lives behind a 21px blur, so its backing store never needs to
+// be full resolution — a quarter of the pixels is indistinguishable at every
+// tier, and this canvas is the most expensive fill on the page.
+const DEPTH_SCALE = .5;
 
 const loader    = document.getElementById('loader');
 const loaderAtom= document.getElementById('loaderAtom');
@@ -692,7 +764,12 @@ const nodes = Array.from({length:N}, (_,i) => {
 // The corridor now ENDS at the chamber rather than running through it. It no
 // longer has to outlast flight+fog on its own, because the destination fills
 // the far field from p ~.70 — you see where you are going down the tunnel.
-const M = 560, CORRIDOR_LEN = 12.9;
+// The corridor is procedural fill, so thinning it is safe — unlike the ball's
+// N, whose birth exponent and framing are hand-tuned against 260 exactly.
+// Boot-only: the watchdog cannot rebuild the edge list, so a device that starts
+// at tier 2+ keeps 560 nodes even after stepping down. The render-side cuts
+// (echo, signals, trails, dpr) are what the ratchet actually buys.
+const M = TIER >= 2 ? 560 : 320, CORRIDOR_LEN = 12.9;
 for (let j=0;j<M;j++){
   const i = N + j, u = j/M;
   const a = GOLDEN*i;
@@ -837,15 +914,40 @@ const layers = ['net','depth','dust'].map(id => {
   return { c, ctx: c.getContext('2d') };
 });
 let W=0, H=0;
-function resize(){
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  W = innerWidth; H = innerHeight;
-  for (const l of layers){
-    l.c.width = W*dpr; l.c.height = H*dpr;
-    l.ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
+// Scroller geometry, cached. Reading it per frame with getBoundingClientRect()
+// forced a layout AFTER the frame had already written ~15 inline styles, which
+// is the textbook thrash pattern. offsetTop is stable until a resize.
+let scrTop = 0, scrSpan = 1, sy = scrollY;
+function measure(){
+  scrTop  = scroller.getBoundingClientRect().top + scrollY;
+  scrSpan = Math.max(1, scroller.offsetHeight - innerHeight);
 }
-addEventListener('resize', resize); resize();
+addEventListener('scroll', () => { sy = scrollY; }, {passive:true});
+
+function resize(){
+  const dpr = Math.min(devicePixelRatio || 1, Q.dpr);
+  W = innerWidth; H = innerHeight;
+  layers.forEach((l, i) => {
+    const s = i === 1 ? DEPTH_SCALE : 1;         // layers[1] is the blurred echo
+    l.c.width  = Math.max(1, Math.round(W*dpr*s));
+    l.c.height = Math.max(1, Math.round(H*dpr*s));
+    l.ctx.setTransform(dpr*s, 0, 0, dpr*s, 0, 0);
+  });
+  measure();
+}
+// Reallocating three DPR-scaled canvases is expensive, and mobile fires `resize`
+// every time the URL bar slides — i.e. DURING the scroll we are trying to keep
+// smooth. Ignore height-only jitter, and coalesce real changes to one per frame.
+{
+  let lw = innerWidth, lh = innerHeight, pending = 0;
+  addEventListener('resize', () => {
+    if (innerWidth === lw && Math.abs(innerHeight - lh) < 120){ measure(); return; }
+    lw = innerWidth; lh = innerHeight;
+    if (pending) return;
+    pending = requestAnimationFrame(() => { pending = 0; resize(); });
+  });
+}
+resize();
 
 const dust = Array.from({length:70}, () => ({
   x:Math.random(), y:Math.random(), r:.6+Math.random()*1.8,
@@ -870,6 +972,11 @@ const PIVOT_Z = [[0,0],[.35,0],[.80,Z_DEST],[1,Z_DEST]];
 const NEAR = .12, FOG_NEAR = 2.4, FOG_FAR = 7.0, FOCAL_IN = 1.60;
 const EB = 10, EA = .55;                        // edge alpha buckets, and their top of range
 const px=[], py=[], pf=[], pAge=[], pdep=[];
+// Node pins get their own, finer bucketing than the edges. Their alpha spans the
+// full 0..1 rather than 0..EA, and the faint end is the FOG at the end of the
+// corridor — 10 buckets would round a .01 pin up to .05 and turn haze into dots.
+const NB = 20;
+const pinPath = new Array(NB);
 const pa=new Float32Array(NALL), pr=new Float32Array(NALL); // alpha/radius, shared by both node passes
 let order = [];                                 // visible indices, far to near
 
@@ -1085,7 +1192,7 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     // partial line: the constellation grows each segment from one end to the other
     P.lineTo(px[e.i]+(px[e.j]-px[e.i])*grow, py[e.i]+(py[e.j]-py[e.i])*grow);
 
-    if (prog > .34){                                      // travelling signal
+    if (Q.signals && prog > .34){                         // travelling signal
       const q = (t*.22 + e.w*3.7) % 1;
       if (q < .95){
         const da = (1-q)*a*4;
@@ -1106,7 +1213,7 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     ctx.fillStyle   = `rgba(46,111,255,${((b+.5)*.8/EB).toFixed(3)})`; ctx.fill(dotPath[b]);
   }
 
-  if (integrate && boot.trail > .01) drawTrails(ctx, boot.trail);
+  if (Q.trails && integrate && boot.trail > .01) drawTrails(ctx, boot.trail);
 
   // ---- NODES, pass 1: bloom, additive -----------------------------------
   // Additive blending is commutative, so this pass needs no depth order at all.
@@ -1118,10 +1225,12 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
     const pop = age < .25 ? age*4 : 1;                    // flash-pop at birth
     const core0 = k === 0;
     // nodes near the pointer brighten, so the cloud reacts before it is even touched
+    // squared compare first, sqrt only inside the radius — same reason as the
+    // edge build above: this runs for every visible node, every frame
     let near = 0;
     if (ptr.active){
-      const d = Math.hypot(px[k]-ptr.x, py[k]-ptr.y);
-      near = clamp(1 - d/190);
+      const dx = px[k]-ptr.x, dy = py[k]-ptr.y, d2 = dx*dx + dy*dy;
+      if (d2 < 190*190) near = 1 - Math.sqrt(d2)/190;
     }
     const a   = alphaMul * (core0 ? .95 : (.25 + .55*clamp(pf[k]-.6) + .45*near))
                 * clamp(age*3) * fadeOf(k);
@@ -1144,10 +1253,21 @@ function drawNetwork(ctx, prog, t, spread, alphaMul, boot, integrate){
   // The pin is what keeps a node a POINT IN SPACE. Bloom alone reads as fog.
   // The constellation carries NO labels, so the whole label pass is gone with the
   // sphere it belonged to.
+  // Batched into quantised-alpha buckets, the same trick the edges use above.
+  // ~880 individual beginPath/arc/fill triples become 10 fills. Painter order
+  // survives in practice: alpha tracks pf, so nearer pins land in later buckets
+  // and still draw over the ones behind them.
+  for (let b=0;b<NB;b++) pinPath[b] = new Path2D();
   for (const k of order){                                 // far to near
-    const a = pa[k], r = pr[k];
-    ctx.fillStyle = `rgba(240,250,255,${a})`;
-    ctx.beginPath(); ctx.arc(px[k],py[k],r*.62,0,6.283); ctx.fill();
+    const a = pa[k], r = pr[k]*.62;
+    if (a <= .004 || r <= .05) continue;
+    const P = pinPath[Math.min(NB-1, (a*NB)|0)];
+    P.moveTo(px[k]+r, py[k]);                             // arc starts at angle 0
+    P.arc(px[k],py[k],r,0,6.283);
+  }
+  for (let b=0;b<NB;b++){
+    ctx.fillStyle = `rgba(240,250,255,${((b+.5)/NB).toFixed(3)})`;
+    ctx.fill(pinPath[b]);
   }
   if (integrate){ ppx.set(px.slice(0,NALL)); ppy.set(py.slice(0,NALL)); }
 
@@ -1174,8 +1294,9 @@ function drawTrails(ctx, trail){
   for (let k=1;k<NALL;k++){
     const age = pAge[k];
     if (!vis[k] || age <= .02 || age >= .999) continue;   // in flight and on screen
-    const dx = px[k]-ppx[k], dy = py[k]-ppy[k], sp = Math.hypot(dx,dy);
-    if (sp < 1.2 || sp > 200) continue;             // stale buffer / resize teleport
+    const dx = px[k]-ppx[k], dy = py[k]-ppy[k], s2 = dx*dx + dy*dy;
+    if (s2 < 1.44 || s2 > 40000) continue;          // stale buffer / resize teleport
+    const sp = Math.sqrt(s2);
     ctx.strokeStyle = `rgba(150,205,255,${(Math.min(sp/40,1)*trail*.5).toFixed(3)})`;
     ctx.beginPath(); ctx.moveTo(ppx[k],ppy[k]); ctx.lineTo(px[k],py[k]); ctx.stroke();
   }
@@ -1183,9 +1304,13 @@ function drawTrails(ctx, trail){
 
 function drawDust(ctx, t, boot){
   ctx.clearRect(0,0,W,H);
-  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(86,200,255,.9)';
+  // The halo used to come from ctx.shadowBlur, which is re-blurred per draw call
+  // and is one of the most expensive things in the 2D API. The node bloom sprite
+  // already IS that falloff, cached as a bitmap, so blit it additively instead.
+  ctx.globalCompositeOperation = 'lighter';
   const pull = boot.suck * -2.4 + boot.kick * 14;   // negative = inward
-  for (const d of dust){
+  for (let i=0;i<Q.dust;i++){
+    const d = dust[i];
     let y = (d.y - t*d.s*.06) % 1; if (y < 0) y += 1;
     const bx = d.x*W + Math.sin(t*.4 + d.r*9)*14, by = y*H;
     if (pull || d.vx || d.ox){
@@ -1194,21 +1319,41 @@ function drawDust(ctx, t, boot){
       d.vy = (d.vy + dy/dist*pull - d.oy*.035) * .90;
       d.ox += d.vx; d.oy += d.vy;
     }
-    ctx.fillStyle = `rgba(120,180,255,${d.a*.5})`;
-    ctx.beginPath();
-    ctx.arc(bx + d.ox, by + d.oy, d.r, 0, 6.283);
-    ctx.fill();
+    // 12x the mote radius reproduces the old r + shadowBlur:12 footprint
+    const s = d.r*12;
+    ctx.globalAlpha = Math.min(1, d.a*.55);
+    ctx.drawImage(SPRITES[0], bx + d.ox - s/2, by + d.oy - s/2, s, s);
   }
-  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// Writing an inline style is never free: it dirties the element even when the
+// value is identical, and this loop touches ~15 elements every frame. Most of
+// them are static for long stretches (the whole flat-scroll, the parked hold),
+// so memoise the last written string and skip the no-ops. Values are rounded to
+// make the comparison actually hit — an unrounded float never repeats.
+const _last = new WeakMap();
+function set(el, prop, val){
+  let m = _last.get(el);
+  if (!m){ m = {}; _last.set(el, m); }
+  if (m[prop] === val) return;
+  m[prop] = val; el.style[prop] = val;
 }
 
 function setScene(el, o, ty, blur, tx){
-  el.style.opacity = o;
-  el.style.transform = `translate3d(${tx||0}px,${ty}px,0)`;
-  el.style.filter = blur ? `blur(${blur}rem)` : 'none';
+  set(el, 'opacity', o.toFixed(3));
+  set(el, 'transform', `translate3d(${(tx||0).toFixed(1)}px,${ty.toFixed(1)}px,0)`);
+  set(el, 'filter', blur ? `blur(${blur}rem)` : 'none');
 }
 
 let lastChapter = '', tLoad = 0, tClose = 0, tBoot = 0, tCollapse = 0, p = 0, lastGap = 0, tPrev = 0;
+let fAcc = 0, fN = 0, slowRuns = 0;             // frame-time watchdog accumulators
+// The stage is the only thing on the page that costs anything to render, and it
+// is a sticky element inside the FIRST section of ten. Once it leaves the
+// viewport the loop stops dead, so the nine flat content sections scroll against
+// zero canvas work. `p` is module state and survives the pause untouched.
+let stageVis = true, running = true;
 function frame(ms){
   const t = ms/1000;
 
@@ -1271,6 +1416,24 @@ function frame(ms){
 
   const dt = tPrev ? Math.min(t - tPrev, .05) : 1/60; tPrev = t;
 
+  // ---- WATCHDOG --------------------------------------------------------
+  // The device hints only guessed. This is the measurement that corrects them:
+  // a 16-frame rolling mean, and two consecutive slow windows step the tier
+  // down. ONE WAY ONLY — an upgrade path would oscillate the moment the lighter
+  // tier ran fast enough to qualify for the heavier one again.
+  // Skipped while `booting`: the blast is legitimately the heaviest moment on
+  // the page and would trip this on hardware that handles the rest fine.
+  // ponytail: fixed 22ms threshold, not refresh-rate aware. A 120Hz panel wants
+  // ~8ms; add screen.refreshRate gating only if someone actually complains.
+  if (!booting && TIER > 0){
+    fAcc += dt;
+    if (++fN === 16){
+      slowRuns = fAcc/16 > .022 ? slowRuns + 1 : 0;
+      fAcc = 0; fN = 0;
+      if (slowRuns >= 2){ slowRuns = 0; TIER--; applyTier(); resize(); }
+    }
+  }
+
   // ---- BOOT ------------------------------------------------------------
   const boot = reduce ? HOLD : bootProgress(bt);
 
@@ -1291,9 +1454,9 @@ function frame(ms){
     kick:  booting ? win(bt, BOOT.blast, BOOT.blast+.02, BOOT.blast+.05, BOOT.blast+.22) : 0
   };
 
-  // scroll picks the timeline up exactly where the boot parked it
-  const r = scroller.getBoundingClientRect();
-  const raw = clamp(-r.top / (r.height - innerHeight));
+  // scroll picks the timeline up exactly where the boot parked it.
+  // Both terms are cached (scroll listener + resize), so this reads no layout.
+  const raw = clamp((sy - scrTop) / scrSpan);
   const target = Math.max(boot, HOLD + (1-HOLD)*raw);
   // during the boot the choreography is frame-exact; the lerp would blur it
   if (booting) p = boot;
@@ -1339,12 +1502,12 @@ function frame(ms){
   const panY   = reduce ? 0 : Math.cos(t*.083) * 14;
   const punch  = win(ic, 0, .02, .06, .34) * .05;      // the blast shoves the lens
   const zoom   = 1.03 + p*.10 + punch;
-  rig.style.transform =
+  set(rig, 'transform',
     `translate3d(${(-p*30 + panX + shake).toFixed(2)}px, ${(-p*20 + panY + shake*.6).toFixed(2)}px, 0)` +
-    ` scale(${zoom.toFixed(3)}) rotate(${(p*2.4 - 1 + Math.sin(t*.062)*.5).toFixed(2)}deg)`;
+    ` scale(${zoom.toFixed(3)}) rotate(${(p*2.4 - 1 + Math.sin(t*.062)*.5).toFixed(2)}deg)`);
   // chromatic split for free: the depth echo is already screen-blended, so an
   // x-offset reads as a colour fringe without a second render pass
-  layers[1].c.style.transform = `translate3d(${(shake*.75).toFixed(2)}px,0,0)`;
+  if (Q.echo) set(layers[1].c, 'transform', `translate3d(${(shake*.75).toFixed(2)}px,0,0)`);
 
   // While the two points are still approaching, the loader overlay is fully
   // opaque — rendering 1120 nodes and 4427 edges underneath it buys nothing and
@@ -1355,16 +1518,18 @@ function frame(ms){
     drawNetwork(layers[0].ctx, p, t, 1, 1, bootState, true);
     // the blurred depth echo is a whole second render; inside, fog already does
     // the atmospheric work, so fade it out across the dive instead of paying for it
-    const echo = .8 * (1 - seg(p, .30, .45));
+    const echo = Q.echo ? .8 * (1 - seg(p, .30, .45)) : 0;
     if (echo > .02) drawNetwork(layers[1].ctx, p, t, 1.045, echo, bootState, false);
     else layers[1].ctx.clearRect(0,0,W,H);
     drawDust(layers[2].ctx, t, bootState);
   }
 
   // the one thing allowed at the pause: the affordance that says scroll
-  cue.style.opacity = (booting ? 0 : clamp((bt - BOOT.hold)/.7) * (1-clamp(raw*12))).toFixed(3);
-  cursor.style.opacity = ptr.active ? (ptr.down ? .9 : .5) : 0;
-  cursor.style.transform = `translate3d(${ptr.x}px,${ptr.y}px,0) translate(-50%,-50%) scale(${ptr.down ? 1.35 : 1})`;
+  set(cue, 'opacity', (booting ? 0 : clamp((bt - BOOT.hold)/.7) * (1-clamp(raw*12))).toFixed(3));
+  set(cursor, 'opacity', ptr.active ? (ptr.down ? .9 : .5).toFixed(2) : '0');
+  if (ptr.active)
+    set(cursor, 'transform',
+        `translate3d(${ptr.x}px,${ptr.y}px,0) translate(-50%,-50%) scale(${ptr.down ? 1.35 : 1})`);
 
   // Scenes 2 to 4 stay network-only until the user scrolls: keyed above HOLD and
   // multiplied by `scrolled`, so nothing can appear during the boot.
@@ -1383,35 +1548,45 @@ function frame(ms){
   setScene(scenes[3], win(p,.88,.93,1.01,1.02)*scrolled,  (0.95-p)*90);
 
   // HUD and rail are chrome, not network — they arrive with the first scroll too
-  hud.style.opacity = railWrap.style.opacity = scrolled.toFixed(3);
+  const chrome = scrolled.toFixed(3);
+  set(hud, 'opacity', chrome); set(railWrap, 'opacity', chrome);
 
   // two flashes: white ignition off the impact clock, blue ascension off progress
   const f1 = win(ic, 0, .02, .07, .25)*.9, f2 = win(p,.78,.795,.805,.83)*.55;
-  flash.style.opacity = Math.max(f1,f2);
-  flash.style.background = f2 > f1
+  const fo = Math.max(f1,f2);
+  set(flash, 'opacity', fo.toFixed(3));
+  if (fo > 0) set(flash, 'background', f2 > f1
     ? 'radial-gradient(46% 40% at 50% 50%, rgba(46,111,255,.95), rgba(86,200,255,.35) 42%, transparent 72%)'
-    : 'radial-gradient(40% 34% at 50% 50%, rgba(255,255,255,.98), rgba(140,190,255,.45) 40%, transparent 70%)';
+    : 'radial-gradient(40% 34% at 50% 50%, rgba(255,255,255,.98), rgba(140,190,255,.45) 40%, transparent 70%)');
 
   // Pre-blast the bloom must be a TIGHT halo, or the lone atom reads as fog on
   // an otherwise empty screen. It blows open with the blast, then the scar it
   // leaves outlives the flash by ~1.5s.
   const flare = booting ? .62 * (1 - seg(bt, BOOT.blast+.02, BOOT.blast+1.6)) : 0;
   const preBlast = booting && bt < BOOT.blast;
-  core.style.transform = `scale(${(booting ? .26 + .74*clamp(ic/.22) : 1).toFixed(3)})`;
-  core.style.opacity = (preBlast ? .55
-    : Math.max(1 - seg(p,0,.30)*.85, flare)).toFixed(3);
+  set(core, 'transform', `scale(${(booting ? .26 + .74*clamp(ic/.22) : 1).toFixed(3)})`);
+  set(core, 'opacity', (preBlast ? .55
+    : Math.max(1 - seg(p,0,.30)*.85, flare)).toFixed(3));
   // halved: screen blending now has a nebula under it, not black, so the same
   // number reads twice as strong and fights the sky
-  rays.style.opacity = (.09 + Math.sin(t*.5)*.03 + p*.11).toFixed(3);
-  rail.style.width   = (p*100).toFixed(1) + '%';
+  set(rays, 'opacity', (.09 + Math.sin(t*.5)*.03 + p*.11).toFixed(3));
+  set(rail, 'transform', `scaleX(${p.toFixed(4)})`);
 
   const ch = p < .14 ? 'Singularity' : p < .34 ? 'Multiplication'
            : p < .56 ? 'First contact' : p < .78 ? 'Orbit' : 'Ascension';
   if (ch !== lastChapter){ chapterEl.textContent = ch; lastChapter = ch; }
 
-  requestAnimationFrame(frame);
+  if (stageVis) requestAnimationFrame(frame);
+  else running = false;                    // the observer below restarts us
 }
 requestAnimationFrame(frame);
+
+// The stop/restart switch for the loop. rootMargin keeps a frame of lead-in, so
+// the stage is already live before its first pixel is on screen.
+new IntersectionObserver(es => {
+  stageVis = es[0].isIntersecting;
+  if (stageVis && !running){ running = true; tPrev = 0; requestAnimationFrame(frame); }
+}, { rootMargin:'200px' }).observe(scroller);
 
 // ======================= reveal for flat sections =======================
 const io = new IntersectionObserver(es => es.forEach(e => {
