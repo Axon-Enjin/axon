@@ -1,0 +1,11 @@
+# Axon Enjin
+
+> Hybrid venture studio and technology company in Metro Manila, Philippines.
+
+Axon Enjin builds the **Operating Layer**: one system for every branch. Clients start with an empty Core, then buy modules (HR, Inventory, CRM, Reporting, Accounting, Scheduling). We also customize modules and build custom AI software (build + 12 months maintenance by default; client owns the app; Axon keeps reusable libraries).
+
+Primary buyers: multi-branch operators (including franchise networks). We work like in-house developers.
+
+Ventures are secondary: cash-floor collaboration; equity optional and rare; not the homepage offer. Ventures get their own names.
+
+Canonical GTM: /docs/COMMERCIAL-MODEL-V2.md

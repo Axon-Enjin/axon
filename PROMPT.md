@@ -5,6 +5,19 @@ The result must be a cinematic, scroll-driven creation myth: **one node sparks, 
 
 ---
 
+## CONTENT GOVERNANCE (8 August 2026)
+
+Visual fidelity rules below still apply. **Copy and IA follow Commercial Model v2**, not the old audit ladder.
+
+- **Source of truth for offers/copy:** [`docs/COMMERCIAL-MODEL-V2.md`](docs/COMMERCIAL-MODEL-V2.md), [`docs/SITEMAP.md`](docs/SITEMAP.md), [`NARRATIVE.md`](NARRATIVE.md)
+- **Product name:** Operating Layer — *One system for every branch. Add the tools you need.*
+- **Three offers only:** modules (add to cart) · modules + customization · custom AI (Build + 12 mo; client owns app)
+- **Ventures:** secondary (footer / late section only); cash floor; no pure-equity CTA
+- **Voice:** plain language (5th–7th grade); never claim BIR/BSP accreditation; never say we accept payments
+- **Do not rebuild** archetype hub or Readiness Audit as the primary CTA
+
+---
+
 ## SOURCE QUIRKS TO PRESERVE
 
 - **There are two clocks, and only one timeline.** The sequence boots on a real-time clock, stops dead at `p = 0.30`, and hands the *same* timeline to scroll. One master value drives everything:

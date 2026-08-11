@@ -129,26 +129,26 @@ https://www.adelt.io/
 
 # Company Document — CANONICAL
 
-> This is the source of truth. Where it conflicts with Working Documents 1–4 below, this section wins.
+> This is the source of truth for company identity, regulatory doctrine (§8), and structural decisions. **For public offers, website IA, and go-to-market packaging, [`COMMERCIAL-MODEL-V2.md`](COMMERCIAL-MODEL-V2.md) wins** (Operating Layer, three offers, module catalog, delivery process). Where the old 5-rung ladder, archetype hub, or Starter/Growth/Enterprise rate card conflict with V2, follow V2 for GTM.
 
 ## **AXON ENJIN**
 
 ## **Company Document**
 
-**Version 1.0 · August 2026 · Philippines**
+**Version 1.0 · August 2026 · Philippines** · **GTM overlay:** Commercial Model v2 (8 August 2026)
 
 ---
 
 ## **Document control**
 
-This is the canonical company document. Where it conflicts with anything else, this wins.
+This is the canonical company document for doctrine. Where it conflicts with Working Documents 1–4 below, this section wins. **GTM packaging is overlaid by Commercial Model v2** — see [`README.md`](README.md) precedence.
 
 |  |  |
 | ----- | ----- |
-| **Status** | Live. Strategy locked, pricing benchmarked but **not yet validated with buyers**. |
+| **Status** | Live. Strategy roots locked. **Public offers follow Commercial Model v2.** Old §6 Growth/audit pesos are not quotable pending a new pricing pass ([`FLAGS.md`](FLAGS.md)). |
 | **Owner** | Founder |
 | **Review cadence** | Every 90 days, or immediately when a threshold in §13 trips |
-| **Supersedes** | Nothing. Consolidates and takes precedence over the four working documents below. |
+| **Supersedes** | Nothing for doctrine. GTM offer ladder / packs / Growth table **superseded for public use by V2**. |
 
 **Working documents (retained for detail, subordinate to this one):**
 
@@ -156,6 +156,8 @@ This is the canonical company document. Where it conflicts with anything else, t
 2. *Target Industry Map & Service Catalog* — full vertical list and module detail  
 3. *Business Model* — purchase paths, canvases, ecosystem  
 4. *Validation & Research Agenda* — what we don't yet know, and how to find out
+
+**GTM companion (wins for public packaging):** [`COMMERCIAL-MODEL-V2.md`](COMMERCIAL-MODEL-V2.md)
 
 **Correction applied in this version.** Working document 1 set implementation fees at 1.0–1.5× first-year subscription, borrowed from the heavyweight-ERP rule of thumb. Applied to per-branch subscription pricing this produces absurd results — an 8-branch client would face a ₱2.3M implementation fee. **Corrected to a fixed base plus per-branch fee** (§6.4). This is the kind of thing a master document exists to catch.
 

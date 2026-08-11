@@ -1,10 +1,65 @@
 # Axon Enjin — Flag Register
 
-**Raised:** 3 August 2026 · **Against:** [`AXON ENJIN Document.md`](AXON%20ENJIN%20Document.md) as source of truth, plus every other file in this repo
-**Owner:** unassigned — assign before the next 90-day review
-**Rule:** a flag is closed by a decision recorded in the Company Document §14, not by discussion.
+**Raised:** 3 August 2026 · **Against:** [`AXON ENJIN Document.md`](AXON%20ENJIN%20Document.md) as source of truth, plus every other file in this repo  
+**GTM update:** 8 August 2026 — see [`COMMERCIAL-MODEL-V2.md`](COMMERCIAL-MODEL-V2.md)  
+**Owner:** unassigned — assign before the next 90-day review  
+**Rule:** a flag is closed by a decision recorded in the Company Document §14, not by discussion. GTM packaging decisions are closed in **Commercial Model v2**.
 
 Line numbers are as of this revision of the source document. Section references (§) are stable and preferred — use those if the document is re-exported from Google Docs.
+
+---
+
+## GTM status — 8 August 2026
+
+**Public offers and website copy follow Commercial Model v2**, not the old 5-rung audit ladder or Starter/Growth/Enterprise table.
+
+| Flag cluster | Status under V2 |
+| ----- | ----- |
+| **F-01, F-02, F-03** (FX / MVC unit / plan contents) | Still **do not quote** old §6 Growth / audit / sprint pesos on the site. V2 requires a **new pricing pass**. Blocking for *old* rate card; site should use “talk to us” until then. |
+| **F-04, F-05, F-07, F-21, F-23** (rate-card arithmetic / stale fees) | **Superseded for GTM packaging** — do not publish those numbers. Keep open until Company Document §6 is rebuilt or formally retired. |
+| **F-12** (campaign plans contradict doctrine) | Still superseded campaigns; also superseded by V2. |
+| **F-27 … F-33** and other **§8 regulatory** flags | **Still active.** Voice and product constraints (no accreditation claims, no payment acceptance claims, Accounting safe scope) remain binding. |
+| **Audit-first site / archetype hub** | **Retired for GTM** by V2 + [`SITEMAP.md`](SITEMAP.md) v2. |
+| **F-34, F-35** (no public pesos; live FX on quotes) | **Raised 8 Aug 2026.** Site never shows ₱. Quotes use an up-to-date converter. |
+
+**Do:** Ship Operating Layer + three offers + module catalog **without any public peso amounts**.  
+**Do not:** Publish ₱95k audit / Growth plan / module list prices on the website.
+
+---
+
+## New flags — 8 August 2026 (Commercial Model v2)
+
+### F-34 — No peso amounts on the public website (quotations only)
+
+**Where:** Site (`index.html`, future `/pricing`), [`COMMERCIAL-MODEL-V2.md`](COMMERCIAL-MODEL-V2.md) pricing stance  
+**Severity:** 🟠 High (GTM / publication rule)  
+**Status:** **Locked decision** — open until §14 / V2 explicitly records it and site + docs are consistent everywhere.
+
+**Decision (founder, 8 Aug 2026):** Public site must **not** show peso (or other currency) prices. Prices appear **only in quotations** sent to prospects/clients.
+
+**Do:** Keep “talk to us” / “book a call” / “how buying works” copy. Internal rate cards and quote templates may hold numbers.  
+**Do not:** Publish Core/module/Offer pesos on the marketing site, even after a V2 pricing pass — that pass feeds **quotations**, not the website.  
+**Closes when:** Written into Company Document §14 (or V2 locked decisions) and a site audit confirms zero public price figures.
+
+**Related:** F-01–F-03 (old rate card); A1 in V2 §10 (repriced for quotes, not for the site).
+
+---
+
+### F-35 — Quotations need a dynamic FX converter (no stale peg)
+
+**Where:** Quotation workflow; Company Document §1 / §6 / §14 currency peg (₱58, reopen at ₱62/₱55); F-01  
+**Severity:** 🟠 High (commercial accuracy)  
+**Status:** Open — capability not built.
+
+**Decision (founder, 8 Aug 2026):** When quoting, currency conversions must be **up to date** via a **dynamic converter**, not a hand-copied stale peg.
+
+**Why:** F-01 already showed the fixed ₱58 peg was ~6% off market and near its own reopen trigger. Publishing or quoting off a stale internal number recreates margin error.
+
+**Do:** Spec and implement a quote-time converter (source + rate date stamped on every quote; e.g. BAP / BSP / agreed feed). Align with RMC 12-2024 if invoices stay PHP-denominated but USD is the system of record.  
+**Do not:** Paste last month’s Google-search FX into a quote, or lock the website to a fixed ₱/USD table.  
+**Closes when:** Quote template/tool uses a live (or same-day) rate, stamps the rate + source + date on the PDF/proposal, and §14 records the conversion rule.
+
+**Related:** F-01; research verified FX baseline; V2 §10 A3.
 
 ---
 
@@ -18,8 +73,9 @@ A sequential research chain was run against this register. **Sub-agent 1 of 7 co
 | **Closed** | R-04 (settled by RMC 12-2024), R-05 (answered from RR 11-2025 primary text), A2 (re-verified with one material correction) |
 | **Evidence closed, decision pending** | F-01 — the FX facts are now firm and one figure was corrected; the peg choice itself is a founder call recorded in Company Document §14 |
 | **Partly served** | F-06 (regulatory derivation supplied), F-13 (regulatory half of the provenance gap closed, pricing half still open), F-15 (the correct clearance test supplied) |
-| **New flags raised** | **F-27 … F-33** — seven defects in §8 this register had not caught |
+| **New flags raised** | **F-27 … F-33** (regulatory, 3 Aug); **F-34, F-35** (no public pesos; dynamic FX on quotes, 8 Aug) |
 | **Still untouched** | F-02, F-03, F-04, F-05, F-07, F-08, F-09, F-10, F-11, F-12, F-14, F-16 … F-26 — these were scoped to sub-agents 2–7 |
+| **GTM packaging** | Superseded by [`COMMERCIAL-MODEL-V2.md`](COMMERCIAL-MODEL-V2.md) (8 Aug 2026) for public offers; regulatory flags unchanged |
 
 To resume the remaining six agents, raise the credit ceiling and re-run the workflow with `resumeFromRunId` — sub-agent 1 replays from cache at no cost. Details at the bottom of this file.
 
@@ -29,12 +85,12 @@ To resume the remaining six agents, raise the credit ceiling and re-run the work
 
 | Severity | Count | Meaning |
 | ----- | ----- | ----- |
-| 🔴 Blocking | 3 | Do not quote a price or qualify a prospect until resolved |
-| 🟠 High | 13 | Resolve inside the 60-day window in §16 |
+| 🔴 Blocking | 3 | Do not quote **old** §6 prices until resolved or replaced by a V2 pricing pass |
+| 🟠 High | 15 | Resolve inside the 60-day window in §16 (includes F-34, F-35) |
 | 🟡 Medium | 16 | Resolve at the next 90-day review |
 | ⚪ Low | 1 | Hygiene on a currently-correct figure |
 
-**The three blocking flags are all in the rate card**, and two of them (F-01, F-02) invalidate the pricing-defensibility argument in §7.2 on their own. The document is strategically strong and commercially not yet quotable. That gap is the single most important thing this register records.
+**The three blocking flags are all in the old rate card.** Under V2, the public site must **not** use those numbers. Regulatory flags (especially F-27…F-33) still bind copy and product scope.
 
 **What the first research pass changed about that judgement.** The regulatory foundation is in better shape than expected — the compliance doctrine survives contact with primary sources, and the one item the document calls existential (the BSP boundary) turns out to have a cheaper and more answerable framing than §8.7 assumed. But §8 carried seven substantive errors, one of which (RMO 9-2021's per-franchisee registration rule) changes how the implementation fee should be *structured*, not just priced. That is now F-28.
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Axon Enjin — Signal from every branch.</title>
-<meta name="description" content="Axon Enjin is the franchise operating layer for Philippine multi-branch networks — the system that carries signal between the centre and every branch. Start with a Franchise Systems Readiness Audit.">
+<title>Axon Enjin — One system for every branch.</title>
+<meta name="description" content="Axon Enjin builds the Operating Layer for multi-branch businesses in the Philippines. Add the tools you need. Customize when you must. Or we build custom AI software. We work like your in-house developers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
@@ -136,9 +136,11 @@ window.__twConfig = { theme: { extend: {
   .rv{ opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
   .rv.in{ opacity:1; transform:none; }
   @media (prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none;transition:none} }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body class="bg-void font-sans text-ice antialiased">
+<h1 class="sr-only">Axon Enjin builds the Operating Layer — one system for every branch.</h1>
 
 <!-- booting: paints on the first frame, before anything else exists -->
 <div id="boot"><i></i><i></i><i></i></div>
@@ -177,18 +179,16 @@ window.__twConfig = { theme: { extend: {
       <span class="h-2 w-2 rounded-full bg-cyan shadow-[0_0_12px_#56c8ff]"></span>
       <span class="font-display text-lg tracking-[.2em] text-white">AXON ENJIN</span>
     </div>
-    <!-- 5 items, platform depth deliberately NOT in the nav: promoting it
-         re-centres the site on the platform, and the ladder says never lead with
-         the platform -->
     <div class="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-ice/60 backdrop-blur-xl md:flex">
-      <a href="#how"        class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">How it works</a>
-      <a href="#for"        class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Who it's for</a>
-      <a href="#compliance" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Compliance</a>
-      <a href="#pricing"    class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Pricing</a>
+      <a href="#how"     class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">How it works</a>
+      <a href="#modules" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Modules</a>
+      <a href="#offers"  class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Offers</a>
+      <a href="#process" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">How we work</a>
+      <a href="#contact" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Contact</a>
     </div>
-    <a href="#contact" class="flex items-center gap-2 rounded-full bg-blue px-5 py-2.5 text-[13px] font-medium text-white transition hover:brightness-110">
-      <iconify-icon icon="solar:clipboard-check-linear" class="text-base"></iconify-icon>
-      <span class="hidden sm:inline">Book an audit</span>
+    <a href="#modules" class="flex items-center gap-2 rounded-full bg-blue px-5 py-2.5 text-[13px] font-medium text-white transition hover:brightness-110">
+      <iconify-icon icon="solar:widget-2-linear" class="text-base"></iconify-icon>
+      <span class="hidden sm:inline">See modules</span>
     </a>
   </div>
 </nav>
@@ -247,26 +247,26 @@ window.__twConfig = { theme: { extend: {
     <div id="s2" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
       <div class="max-w-xl">
         <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">01 — The problem</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">You cannot see<br>what happens<br>outside head office</h2>
-        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Standardisation across locations. Visibility for the franchisor. Simplicity for the franchisee. Every network has the same three problems.</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">You cannot see<br>what happens<br>at every branch</h2>
+        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">When you run more than one location, head office needs one clear picture. Spreadsheets and separate apps do not give you that.</p>
       </div>
     </div>
 
     <!-- SCENE 3 — first contact -->
     <div id="s3" class="scene pointer-events-none absolute inset-0 z-20 flex items-center justify-end px-8 text-right md:px-20">
       <div class="max-w-xl">
-        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">02 — The category</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Not an ERP.<br>Not a POS.<br>An operating layer</h2>
-        <p class="mt-7 ml-auto max-w-sm text-[15px] leading-relaxed text-ice/55">Generic ERPs treat every location as a separate company. POS vendors stop at the counter. Royalty, franchisee compliance, commissary and branch performance belong in one place.</p>
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">02 — The product</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">One system.<br>Add the tools<br>you need</h2>
+        <p class="mt-7 ml-auto max-w-sm text-[15px] leading-relaxed text-ice/55">You start with an empty Operating Layer. Buy modules — HR, stock, CRM, and more — and each one unlocks a new tab. Same system for every branch.</p>
       </div>
     </div>
 
     <!-- SCENE 4 — orbit -->
     <div id="s4" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
       <div class="max-w-xl">
-        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — The scope</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Built for<br>networks,<br>not locations</h2>
-        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Five to fifty branches. Keep your existing POS — we connect to it. See every branch's numbers by 9am.</p>
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — How we work</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Like your<br>in-house<br>developers</h2>
+        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Built for multi-branch businesses — including franchise networks. Need a custom fit? We tailor it. Need brand-new AI software? We build it. You own what you paid for.</p>
       </div>
     </div>
 
@@ -274,9 +274,9 @@ window.__twConfig = { theme: { extend: {
     <div id="s5" class="scene pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center">
       <p class="mb-7 text-[11px] uppercase tracking-[.4em] text-ice/45">04 — The network</p>
       <p class="font-display text-white" style="font-size:clamp(46px,10vw,150px);letter-spacing:.22em;line-height:1;text-indent:.22em">AXON ENJIN</p>
-      <h2 class="mt-6 font-heading uppercase text-white/90" style="font-size:clamp(18px,2.4vw,32px);letter-spacing:.06em">Signal from every branch</h2>
-      <a href="#pricing" class="pointer-events-auto mt-12 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">
-        Book a Readiness Audit
+      <h2 class="mt-6 font-heading uppercase text-white/90" style="font-size:clamp(18px,2.4vw,32px);letter-spacing:.06em">One system for every branch</h2>
+      <a href="#modules" class="pointer-events-auto mt-12 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">
+        See the modules
         <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
       </a>
     </div>
@@ -290,8 +290,8 @@ window.__twConfig = { theme: { extend: {
       <div class="rv">
         <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">How it works</p>
         <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Centre to<br>every branch</h2>
-        <p class="mt-8 max-w-md text-[15px] leading-relaxed text-ice/55">In a neuron, the axon is the fibre that carries signal away from the cell body out to distant terminals. Head office is the cell body. Each branch is a terminal. What franchisors lack is conduction — signal from the centre reaching every branch, and signal from every branch returning fast enough to act on.</p>
-        <p class="mt-4 max-w-md text-[15px] leading-relaxed text-ice/55">Unlike an agency, we own products and build ventures — so the tooling improves whether or not you are paying us this month.</p>
+        <p class="mt-8 max-w-md text-[15px] leading-relaxed text-ice/55">Head office is the centre. Each branch is an edge. The Operating Layer carries the signal both ways — so you see what is happening, and every branch works from the same system.</p>
+        <p class="mt-4 max-w-md text-[15px] leading-relaxed text-ice/55">We work like your in-house developers. We also build ventures — so the tools keep getting better, even when you are not paying us this month.</p>
       </div>
 
       <div class="rv space-y-6">
@@ -305,87 +305,69 @@ window.__twConfig = { theme: { extend: {
         </div>
         <div class="rounded-2xl border border-white/10 p-7">
           <iconify-icon icon="solar:buildings-3-linear" class="text-2xl text-cyan"></iconify-icon>
-          <p class="mt-4 text-[15px] leading-relaxed text-ice/55">Built for networks of 5 to 50 branches. Royalty, franchisee compliance, commissary and branch performance in one place.</p>
+          <p class="mt-4 text-[15px] leading-relaxed text-ice/55">Built for people who run more than one branch — including franchise networks.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========================== 3. WHO IT'S FOR ========================= -->
-<!-- Archetypes, NOT verticals. Verticals inside an archetype share roughly 80%
-     of their software, and with no customers yet the archetype is the only
-     honest way to claim relevant experience. Vertical pages come later and sit
-     UNDER the archetype, never beside it. -->
-<section id="for" class="bg-void py-28 md:py-40">
+<!-- ========================== 3. MODULES ========================= -->
+<section id="modules" class="bg-void py-28 md:py-40">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv mb-16 flex flex-wrap items-end justify-between gap-8">
       <div>
-        <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Who it's for</p>
-        <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Five ways a<br>network transacts</h2>
+        <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Modules</p>
+        <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Start empty.<br>Add tools.</h2>
       </div>
-      <p class="max-w-xs text-[15px] leading-relaxed text-ice/45">We do not think in verticals. We think in operating archetypes, defined by how the business transacts.</p>
+      <p class="max-w-xs text-[15px] leading-relaxed text-ice/45">Each module you buy unlocks a new tab in the same system. We build every module.</p>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <article class="rv rounded-2xl border border-blue/30 bg-blue/5 p-7">
+        <iconify-icon icon="solar:widget-2-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Core</h3>
+        <p class="mt-2 text-[13px] text-ice/40">Required</p>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Login, branches, roles, home screen, billing for modules, and an activity log. Your empty Operating Layer.</p>
+      </article>
       <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <div class="flex items-center justify-between">
-          <iconify-icon icon="solar:shop-2-linear" class="text-2xl text-cyan"></iconify-icon>
-          <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Available now</span>
-        </div>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Store</h3>
-        <p class="mt-2 text-[13px] text-ice/40">Counter transaction, inventory-driven</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Inventory, transfers, commissary, purchasing, branch P&amp;L. QSR, café, milk tea, bakery, pharmacy, pet retail, agri-input.</p>
+        <iconify-icon icon="solar:users-group-rounded-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">HR</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">People, branch roles, and basic attendance records.</p>
       </article>
-
       <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <div class="flex items-center justify-between">
-          <iconify-icon icon="solar:calendar-linear" class="text-2xl text-cyan"></iconify-icon>
-          <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Available now</span>
-        </div>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Appointment</h3>
-        <p class="mt-2 text-[13px] text-ice/40">Staff time and capacity</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Booking, staff utilisation, commission payroll, packages, client records. Salon, spa, derma, dental, optical, vet, fitness.</p>
+        <iconify-icon icon="solar:box-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Inventory</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Stock levels, moves between branches, and simple counts.</p>
       </article>
-
-      <article class="rv rounded-2xl border border-white/10 p-7">
-        <div class="flex items-center justify-between">
-          <iconify-icon icon="solar:map-point-wave-linear" class="text-2xl text-ice/45"></iconify-icon>
-          <span class="rounded-full border border-white/10 px-3 py-1 text-[11px] text-ice/40">In build</span>
-        </div>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white/80">Field service</h3>
-        <p class="mt-2 text-[13px] text-ice/40">Work travels to the customer</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/45">Dispatch, technician mobile, routing, job costing, SLA. Pest control, aircon cleaning, cleaning, home services.</p>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <iconify-icon icon="solar:user-heart-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">CRM</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Customers, contacts, and a simple history of work with them.</p>
       </article>
-
-      <article class="rv rounded-2xl border border-white/10 p-7">
-        <div class="flex items-center justify-between">
-          <iconify-icon icon="solar:wrench-linear" class="text-2xl text-ice/45"></iconify-icon>
-          <span class="rounded-full border border-white/10 px-3 py-1 text-[11px] text-ice/40">In build</span>
-        </div>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white/80">Service bay</h3>
-        <p class="mt-2 text-[13px] text-ice/40">Job orders against assets</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/45">Job order, parts inventory, estimates, warranty, bay scheduling. Auto service, lube, tyre, printing, device repair.</p>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <iconify-icon icon="solar:chart-square-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Reporting</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Branch and network numbers on one dashboard.</p>
       </article>
-
-      <article class="rv rounded-2xl border border-white/10 p-7">
-        <div class="flex items-center justify-between">
-          <iconify-icon icon="solar:notebook-linear" class="text-2xl text-ice/45"></iconify-icon>
-          <span class="rounded-full border border-white/10 px-3 py-1 text-[11px] text-ice/40">Planned</span>
-        </div>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white/80">Enrollment</h3>
-        <p class="mt-2 text-[13px] text-ice/40">Cohorts and terms</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/45">Enrollment, tuition and installment billing, attendance, batch scheduling. Tutorial, review, training centres, driving schools.</p>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <iconify-icon icon="solar:calculator-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Accounting</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Management books and reports. Export or sync to the accounting system you already register with the BIR. We do not replace that registration.</p>
       </article>
-
-      <article class="rv flex flex-col justify-between rounded-2xl border border-blue/30 bg-blue/5 p-7">
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <iconify-icon icon="solar:calendar-linear" class="text-2xl text-cyan"></iconify-icon>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Scheduling</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Bookings, shifts, and appointments in one place.</p>
+      </article>
+      <article class="rv flex flex-col justify-between rounded-2xl border border-white/10 p-7 md:col-span-2 lg:col-span-2">
         <div>
-          <iconify-icon icon="solar:clipboard-check-linear" class="text-2xl text-cyan"></iconify-icon>
-          <h3 class="mt-6 font-heading text-2xl uppercase text-white">Not sure which?</h3>
-          <p class="mt-5 text-[14px] leading-relaxed text-ice/55">The Readiness Audit maps how your network actually transacts before anyone quotes you anything.</p>
+          <iconify-icon icon="solar:chat-round-linear" class="text-2xl text-cyan"></iconify-icon>
+          <h3 class="mt-6 font-heading text-2xl uppercase text-white">Ready to pick modules?</h3>
+          <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Tell us which branches you run and which tools you need. We will walk you through Core and the catalog.</p>
         </div>
-        <a href="#pricing" class="mt-7 inline-flex items-center gap-2 text-[13px] font-medium text-cyan hover:underline">
-          See what it costs
+        <a href="#contact" class="mt-7 inline-flex items-center gap-2 text-[13px] font-medium text-cyan hover:underline">
+          Talk to us
           <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
         </a>
       </article>
@@ -393,202 +375,169 @@ window.__twConfig = { theme: { extend: {
   </div>
 </section>
 
-<!-- ========================== 4. COMPLIANCE ========================== -->
-<!-- The gatekeeper page, compressed into a section: the finance head or external
-     CPA is where deals die, and a CPA who finds nothing about BIR registration
-     assumes the worst. LEGAL CONSTRAINTS on this copy: never "fully BIR
-     compliant", never "BIR accredited", never imply that buying the software
-     produces a registration outcome, never represent payment acceptance as an
-     Axon Enjin capability, never quantify a client's tax deduction. -->
-<section id="compliance" class="bg-void py-28 md:py-40">
+<!-- ========================== 4. THREE OFFERS ========================= -->
+<section id="offers" class="bg-void py-28 md:py-40">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv mb-16">
-      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Compliance</p>
-      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Stated plainly</h2>
-      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">The software is compliant by design. <span class="text-white">You</span> hold the registration and you file. Money never moves through our system, only past it — we integrate your gateway, and the gateway accepts payments.</p>
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Offers</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Three ways<br>to work with us</h2>
     </div>
-
     <div class="grid gap-6 lg:grid-cols-3">
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">What we build regardless of who files</h3>
-        <ul class="mt-5 space-y-2 text-[14px] leading-relaxed text-ice/55">
-          <li>Sequential, non-resettable numbering</li>
-          <li>Non-resettable grand total</li>
-          <li>Retained X and Z readings</li>
-          <li>Senior citizen and PWD discounts</li>
-          <li>Audit trail and Standard Audit File export</li>
-          <li>EIS transmission capability where you are covered</li>
-          <li>Local storage and backup with authorised BIR access</li>
-        </ul>
+      <div class="rv rounded-2xl border border-blue/30 bg-blue/5 p-8">
+        <span class="rounded-full bg-blue px-3 py-1 text-[11px] font-medium text-white">Offer 1</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Modules, add to cart</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Empty Operating Layer plus the catalog modules you choose. Standard setup. Typical path to live: about four weeks.</p>
       </div>
-
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">What we warrant, and what we do not</h3>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">We warrant that the software implements the functional requirements of the applicable BIR issuances as at the effective date.</p>
-        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">We do not warrant that you will obtain accreditation or registration. That depends on your filings, your tax standing, and RDO discretion.</p>
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-8">
+        <span class="rounded-full border border-white/15 px-3 py-1 text-[11px] text-ice/70">Offer 2</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Modules + customization</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Same catalog, then we tailor fields, workflows, or extra tabs so it fits how you really work. Typical path: about three months.</p>
       </div>
-
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">Who registers what</h3>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Under RMO 9-2021, each franchisee registers the system at its own RDO and receives its own Acknowledgement Certificate — even on shared servers running identical software.</p>
-        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">Most franchisors do not know this. It changes implementation scope, so we ask about it before we quote.</p>
-      </div>
-    </div>
-
-    <div class="rv mt-6 rounded-2xl border border-white/10 p-7">
-      <div class="flex flex-wrap items-start justify-between gap-6">
-        <div class="max-w-2xl">
-          <h3 class="font-heading text-xl uppercase text-white">The 31 December 2026 e-invoicing deadline</h3>
-          <p class="mt-4 text-[14px] leading-relaxed text-ice/55">The mandate under RR 11-2025, as extended to 31 December 2026 by RR 26-2025, covers e-commerce and internet transactions — a wide definition that expressly includes sale through digital platforms and food delivery — along with Large Taxpayers Service taxpayers, Large Taxpayers under the gross-sales test, and users of a CAS, CBA with e-invoicing, or other invoicing software.</p>
-          <p class="mt-4 text-[14px] leading-relaxed text-ice/55">The question worth asking yourself: do you sell or take payment online in any form — delivery apps, your own site, an online store, bookings with deposits? Having a POS is not the same as being covered, and paper invoices without transmission capability are not electronic invoices.</p>
-          <p class="mt-4 text-[13px] text-ice/40">Regulatory position current as at August 2026. Your accountant should confirm your own coverage.</p>
-        </div>
-        <a href="#pricing" class="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-[13px] font-medium text-white transition hover:bg-white/10">
-          Get a dated determination
-          <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
-        </a>
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-8">
+        <span class="rounded-full border border-white/15 px-3 py-1 text-[11px] text-ice/70">Offer 3</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Custom AI software</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">We build new software for you. Default: build plus twelve months of care. You own the app. We keep our shared libraries. You can extend or drop maintenance.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- =========================== 5. PRICING =========================== -->
-<!-- Entry offers priced. The platform rate card is deliberately NOT published:
-     it is not internally consistent yet, the ladder forbids leading with the
-     platform, and a naked per-branch number invites comparison against a POS,
-     which is the exact framing the positioning exists to defeat. -->
+<!-- ========================== 5. HOW WE WORK ========================= -->
+<section id="process" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-16">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">How we work</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">From first talk<br>to go-live</h2>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Eight steps to delivery. Then we care for the system under your plan.</p>
+    </div>
+    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">01</span><p class="mt-3 font-heading text-lg uppercase text-white">Inquiry</p><p class="mt-2 text-[13px] text-ice/50">Tell us which offer and how many branches.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">02</span><p class="mt-3 font-heading text-lg uppercase text-white">Discovery</p><p class="mt-2 text-[13px] text-ice/50">We learn what you need and write it down.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">03</span><p class="mt-3 font-heading text-lg uppercase text-white">Proposal</p><p class="mt-2 text-[13px] text-ice/50">Price, time, what is in and out.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">04</span><p class="mt-3 font-heading text-lg uppercase text-white">Agreement</p><p class="mt-2 text-[13px] text-ice/50">Contract and first payment.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">05</span><p class="mt-3 font-heading text-lg uppercase text-white">Kickoff</p><p class="mt-2 text-[13px] text-ice/50">Access, people, and branch list.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">06</span><p class="mt-3 font-heading text-lg uppercase text-white">Build</p><p class="mt-2 text-[13px] text-ice/50">Turn on modules, customize, or build new.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">07</span><p class="mt-3 font-heading text-lg uppercase text-white">Test &amp; train</p><p class="mt-2 text-[13px] text-ice/50">You try it. We train your team.</p></li>
+      <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">08</span><p class="mt-3 font-heading text-lg uppercase text-white">Go-live</p><p class="mt-2 text-[13px] text-ice/50">Live cutover, then ongoing care.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ========================== 6. PLAIN RULES ========================= -->
+<section id="compliance" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-12">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Plain rules</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Said clearly</h2>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55"><span class="text-white">You</span> hold your tax registrations and you file. We build software. We do not claim BIR or BSP accreditation we do not hold. Money does not move through us — your payment gateway accepts payments.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== 7. PRICING =========================== -->
 <section id="pricing" class="bg-void py-28 md:py-40">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv mb-16 flex flex-wrap items-end justify-between gap-8">
       <div>
         <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Pricing</p>
-        <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Start with<br>the audit</h2>
+        <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">How buying<br>works</h2>
       </div>
-      <p class="max-w-sm text-[15px] leading-relaxed text-ice/45">Nobody should buy a platform from a vendor they have not tested. Each step qualifies you for the next.</p>
+      <p class="max-w-sm text-[15px] leading-relaxed text-ice/45">We do not publish prices here. You get numbers in a written quote after we know your branches and modules.</p>
     </div>
-
-    <div class="rv mb-6 rounded-3xl border border-blue/30 bg-blue/5 p-8 md:p-12">
-      <div class="flex flex-wrap items-start justify-between gap-8">
-        <div class="max-w-xl">
-          <span class="rounded-full bg-blue px-3 py-1 text-[11px] font-medium text-white">Start here</span>
-          <h3 class="mt-6 font-heading text-3xl uppercase text-white md:text-4xl">Franchise Systems Readiness Audit</h3>
-          <p class="mt-5 text-[15px] leading-relaxed text-ice/60">Two weeks. You get a process map, a systems inventory, a compliance gap list, a prioritised roadmap, and a dated, cited EIS coverage determination against RR 11-2025.</p>
-          <p class="mt-4 text-[15px] leading-relaxed text-ice/60">It is paid because free proposals produce free-proposal-quality thinking. It is not a sales call and not a demo — you keep the document whether or not you buy, and the fee is credited against what you buy next.</p>
-          <p class="mt-6 text-[13px] text-ice/40">For networks with 3 or more branches, a head office with someone accountable for operations, and a named internal project owner.</p>
-        </div>
-        <div class="shrink-0">
-          <p class="font-heading text-5xl text-white md:text-6xl">₱95,000</p>
-          <p class="mt-2 text-[13px] text-ice/45">+ VAT · credited against<br>what you buy next</p>
-        </div>
+    <div class="grid gap-6 md:grid-cols-3">
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Offer 1</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Core plus the modules you pick. Recurring. Talk to us for a quote.</p>
+      </div>
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Offer 2</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Offer 1, plus scoped customization priced as fixed blocks or time.</p>
+      </div>
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Offer 3</h3>
+        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Project quote: build plus twelve months care by default. Maintenance is a clear line so you can keep, shorten, or remove it.</p>
       </div>
     </div>
-
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">Automation Sprint</h3>
-        <p class="mt-4 font-heading text-3xl text-white">₱145,000</p>
-        <p class="mt-1 text-[13px] text-ice/40">+ VAT · fixed scope · 3 weeks</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Low-risk proof of competence on one workflow, at a fixed price you can hold us to.</p>
-      </div>
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">Compliance Pack</h3>
-        <p class="mt-4 font-heading text-3xl text-white">₱30,000</p>
-        <p class="mt-1 text-[13px] text-ice/40">+ VAT</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">System description, process flow, sample invoices, backup and DR plan, sworn-statement annex data, X and Z reading samples.</p>
-      </div>
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">Custom build</h3>
-        <p class="mt-4 font-heading text-3xl text-white">From ₱464,000</p>
-        <p class="mt-1 text-[13px] text-ice/40">Client-owned</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">For operators who want to own the asset outright, with the compliance work carried by us.</p>
-      </div>
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <h3 class="font-heading text-xl uppercase text-white">Engine retainer</h3>
-        <p class="mt-4 font-heading text-3xl text-white">From ₱180,000</p>
-        <p class="mt-1 text-[13px] text-ice/40">per month</p>
-        <p class="mt-5 text-[14px] leading-relaxed text-ice/55">Ongoing capacity rather than a list of deliverables.</p>
-      </div>
-    </div>
-
     <div class="rv mt-6 rounded-2xl border border-white/10 p-7">
-      <h3 class="font-heading text-xl uppercase text-white">How platform pricing works</h3>
-      <p class="mt-4 max-w-3xl text-[15px] leading-relaxed text-ice/55">Per branch, because a network is what we serve. Annual prepay, with two months free. Priced by the archetype pack plus the franchise modules you actually use. Implementation is quoted separately and honestly, because it varies with how many of your branches are separately registered taxpayers.</p>
-      <p class="mt-4 max-w-3xl text-[15px] leading-relaxed text-white/80">We quote after the audit, because quoting before it would be guessing.</p>
+      <p class="max-w-3xl text-[15px] leading-relaxed text-ice/55">On custom builds, <span class="text-white">you own the app</span> you paid for. Axon keeps reusable libraries so we can keep making the Operating Layer better.</p>
     </div>
   </div>
 </section>
 
-<!-- ============================= 6. TEAM ============================= -->
-<!-- The proof substitute, because there are no case studies. Surnames and the
-     exact split of responsibilities still need confirming before this is
-     presented as final; the split shown is the one recorded in the alignment
-     notes. Competition results and the PUP affiliation are deliberately NOT
-     here: the brand rules out hackathon-led credibility framing, and the
-     specifics were not verifiable from the source document. -->
+<!-- ============================= 8. TEAM ============================= -->
 <section id="team" class="bg-void py-28 md:py-40">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv mb-16">
       <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Who builds it</p>
       <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Four people,<br>named</h2>
-      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">We have no client case studies to show you, because we have no clients yet. Saying otherwise would be the fastest way to lose the thing we are actually selling. What we have instead is a paid diagnostic: buy two weeks and judge the document.</p>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">A lean team in Metro Manila. We work like in-house developers for your business — and, when it fits, for people building startups.</p>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Build</span>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Rhandie</h3>
-        <p class="mt-1 text-[13px] text-ice/45">Engineering and operations</p>
+        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">CEO</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Jerico</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Carlos Jerico Dela Torre — business, finance, legal</p>
+      </div>
+      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">CTO</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Aidan</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Aidan Tiu — technology</p>
       </div>
       <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
         <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Build</span>
         <h3 class="mt-6 font-heading text-2xl uppercase text-white">Gerald</h3>
-        <p class="mt-1 text-[13px] text-ice/45">Engineering and operations</p>
+        <p class="mt-1 text-[13px] text-ice/45">Gerald Berongoy — deputy engineer</p>
       </div>
       <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Business</span>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Aidan</h3>
-        <p class="mt-1 text-[13px] text-ice/45">Business and technology</p>
-      </div>
-      <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
-        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Business</span>
-        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Jerico</h3>
-        <p class="mt-1 text-[13px] text-ice/45">Business, finance and legal</p>
+        <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">Build</span>
+        <h3 class="mt-6 font-heading text-2xl uppercase text-white">Rhandie</h3>
+        <p class="mt-1 text-[13px] text-ice/45">Rhandie Sales Jr. — deputy engineer</p>
       </div>
     </div>
 
-    <p class="rv mt-10 max-w-2xl text-[15px] leading-relaxed text-ice/45">Axon Enjin is a hybrid venture studio and technology operating company based in Metro Manila. We work in the Philippines only, for now.</p>
+    <p class="rv mt-10 max-w-2xl text-[15px] leading-relaxed text-ice/45">Axon Enjin is a hybrid: we deliver the Operating Layer for clients, and we sometimes co-build startups. Ventures get their own names.</p>
   </div>
 </section>
 
-<!-- =========================== 5. CONTACT =========================== -->
+<!-- ========================== 9. VENTURES (secondary) ========================= -->
+<section id="ventures" class="bg-void py-20 md:py-28">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv rounded-2xl border border-white/10 p-8 md:p-10">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Ventures</p>
+      <h2 class="mt-4 font-heading text-2xl uppercase text-white md:text-3xl">Building a startup?</h2>
+      <p class="mt-5 max-w-2xl text-[15px] leading-relaxed text-ice/55">We can be the builders inside your startup. We select carefully — clear problem, someone who will run it, and fit for a four-person team. Public work is a paid build with a cash floor; equity only sometimes, as an add-on. We do not offer free equity builds on this site.</p>
+      <a href="#contact" class="mt-8 inline-flex items-center gap-2 text-[13px] font-medium text-cyan hover:underline">
+        Ask about collaboration
+        <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== 10. CONTACT =========================== -->
 <section id="contact" class="bg-void pb-28 md:pb-40">
   <div class="mx-auto max-w-6xl px-6">
-    <!-- TODO before publishing: wire the CTA to a real booking destination and add
-         the company's contact address. There is no verified email or calendar
-         link in the source document, and inventing one is worse than omitting
-         it. The questions below are the qualifying fields from the site spec;
-         question 3 is the one that matters most and must never auto-reject. -->
     <div class="rv rounded-3xl border border-white/10 bg-deep px-8 py-20 md:px-16">
       <div class="grid gap-12 lg:grid-cols-2">
         <div>
-          <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Book an audit</p>
-          <h2 class="mt-6 font-heading uppercase text-white" style="font-size:clamp(32px,5vw,60px);line-height:.94;letter-spacing:-.02em">Two weeks,<br>then you decide</h2>
-          <p class="mt-7 max-w-md text-[15px] leading-relaxed text-ice/50">If your network runs 3 or more branches and someone at head office is accountable for operations, the audit is the place to start. If it does not, say so — the Automation Sprint is the better door, and we will tell you that rather than sell you a platform.</p>
-          <a href="#pricing" class="mt-10 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">
-            Book a Readiness Audit
+          <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Talk to us</p>
+          <h2 class="mt-6 font-heading uppercase text-white" style="font-size:clamp(32px,5vw,60px);line-height:.94;letter-spacing:-.02em">Tell us what<br>you need</h2>
+          <p class="mt-7 max-w-md text-[15px] leading-relaxed text-ice/50">Modules for your branches, a custom fit, custom AI software, or a startup collaboration. We will point you to the right offer.</p>
+          <a href="#contact" class="mt-10 inline-flex items-center gap-2 rounded-full bg-blue px-7 py-3.5 text-[13px] font-medium text-white transition hover:brightness-110">
+            Start a conversation
             <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
           </a>
+          <p class="mt-4 text-[12px] text-ice/35">Wire this button to your real inbox or booking link before publishing.</p>
         </div>
         <div>
           <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">What we will ask</p>
           <ol class="mt-6 space-y-3 text-[15px] leading-relaxed text-ice/55">
-            <li>How many branches?</li>
-            <li>Typical monthly sales per branch?</li>
-            <li>Who would run this day to day, by name — and do they have the time?</li>
-            <li>How many branches are franchisee-owned, and are those franchisees separate taxpayers?</li>
-            <li>Do you sell or take payment online in any form?</li>
-            <li>What are you using now, and what is still in spreadsheets?</li>
-            <li>Who else has to agree to this?</li>
+            <li>Which offer — modules, customize, custom AI, or collaboration?</li>
+            <li>How many branches (if any)?</li>
+            <li>What tools do you use now?</li>
+            <li>Who will own this day to day?</li>
+            <li>What does success look like in ninety days?</li>
           </ol>
         </div>
       </div>
@@ -599,7 +548,13 @@ window.__twConfig = { theme: { extend: {
 <footer class="bg-void pb-14">
   <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 border-t border-white/10 px-6 pt-8 text-[13px] text-ice/40">
     <span>&copy; 2026 Axon Enjin</span>
-    <span>Metro Manila, Philippines</span>
+    <div class="flex flex-wrap gap-4">
+      <a href="#modules" class="hover:text-ice/70">Modules</a>
+      <a href="#offers" class="hover:text-ice/70">Offers</a>
+      <a href="#ventures" class="hover:text-ice/70">Ventures</a>
+      <a href="#contact" class="hover:text-ice/70">Contact</a>
+      <span>Metro Manila, Philippines</span>
+    </div>
   </div>
 </footer>
 
@@ -607,6 +562,7 @@ window.__twConfig = { theme: { extend: {
 // ======================= genesis engine =======================
 const scroller  = document.getElementById('scroller');
 const rig       = document.getElementById('rig');
+
 const flash     = document.getElementById('flash');
 const rail      = document.getElementById('rail');
 const rays      = document.getElementById('rays');
