@@ -237,10 +237,9 @@ Ventures are findable, never first. Offer 3: you own the app; we keep our shared
 
 | # | Ask | Why it’s open | Unblock with |
 | ----- | ----- | ----- | ----- |
-| **A1** | **V2 price list for quotations** — Core + modules + Offer 2/3 (Build + 12 mo care) | Old §6 numbers exist but are unquotable (see private company-docs FLAGS) F-01/F-02/F-03). New list is for **quotes only** — see **F-34** (no pesos on the site). | Founder price list mapped to Offer 1–3 + modules; used in quote templates only |
+| **A1** | **V2 price list for quotations** — Core + modules + Offer 2/3 (Build + 12 mo care) | Old §6 numbers exist but are unquotable ([`FLAGS.md`](../00_GOVERNANCE/../00_GOVERNANCE/FLAGS.md) F-01/F-02/F-03). New list is for **quotes only** — see **F-34** (no pesos on the site). | Founder price list mapped to Offer 1–3 + modules; used in quote templates only |
 | **A2** | **Google Calendar booking** on the site contact CTA | Prospects book a call on Google Calendar. No booking URL in the repo yet. | Share the public Google Calendar appointment link; wire CTAs → that URL |
 | **A3** | **Dynamic FX converter for quotations** | Quotes must convert at an up-to-date rate, not a stale peg — **F-35**. | Choose feed (e.g. BAP), stamp rate + date + source on every quote; optional small tool/sheet |
-
 
 
 
