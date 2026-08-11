@@ -1,11 +1,11 @@
 # Website Grounding Manifest
-# Mirrored to Axon-Enjin/axon → docs/grounding/
+# Mirrored to Axon-Enjin/website → docs/grounding/
 
 pack_version: "1.0.0"
 exported: "2026-08-11"
 authority: level-2
 source_repo: Axon-Enjin/company-docs
-consumer_repo: Axon-Enjin/axon
+consumer_repo: Axon-Enjin/website
 consumer_path: docs/grounding/
 
 files:
@@ -26,4 +26,4 @@ authority_sources:
 rules:
   - No peso or currency prices in any mirrored file intended for public copy.
   - Do not add client-confidential files to this pack.
-  - Changes to this pack open a PR on Axon-Enjin/axon; no silent overwrite.
+  - Changes to this pack open a PR on Axon-Enjin/website; no silent overwrite.

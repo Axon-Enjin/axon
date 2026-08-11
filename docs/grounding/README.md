@@ -14,7 +14,7 @@ superseded_by:
 
 # Website Grounding Pack
 
-This folder is the **only** surface of `company-docs` that may be mirrored to the public website repository (`Axon-Enjin/axon`).
+This folder is the **only** surface of `company-docs` that may be mirrored to the public website repository (`Axon-Enjin/website`).
 
 ## Why this exists
 
@@ -35,8 +35,8 @@ This folder is the **only** surface of `company-docs` that may be mirrored to th
 
 ## Consumer path
 
-`Axon-Enjin/axon` → `docs/grounding/` (committed mirror)
+`Axon-Enjin/website` → `docs/grounding/` (committed mirror)
 
 ## Change rule
 
-When V2, sitemap, or this pack changes → open a PR on `Axon-Enjin/axon` updating `docs/grounding/`. Humans review before merge.
+When V2, sitemap, or this pack changes → open a PR on `Axon-Enjin/website` updating `docs/grounding/`. Humans review before merge.
