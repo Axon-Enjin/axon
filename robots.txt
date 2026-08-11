@@ -1,0 +1,35 @@
+# Axon Enjin
+# TODO before publishing: replace the Sitemap host with the real domain.
+
+User-agent: *
+Allow: /
+
+# Internal strategy, pricing history and research notes. Not for indexing.
+Disallow: /docs/
+
+# AI crawlers are welcome. /llms.txt carries the canonical plain-language summary.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://axonenjin.com/sitemap.xml

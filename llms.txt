@@ -1,11 +1,47 @@
 # Axon Enjin
 
-> Hybrid venture studio and technology company in Metro Manila, Philippines.
+> Axon Enjin builds the Operating Layer: one system for every branch. We are a hybrid venture studio and technology operating company in Metro Manila, Philippines, working with multi-branch businesses including franchise networks.
 
-Axon Enjin builds the **Operating Layer**: one system for every branch. Clients start with an empty Core, then buy modules (HR, Inventory, CRM, Reporting, Accounting, Scheduling). We also customize modules and build custom AI software (build + 12 months maintenance by default; client owns the app; Axon keeps reusable libraries).
+**One-line description:** One system for every branch. Add the tools you need.
 
-Primary buyers: multi-branch operators (including franchise networks). We work like in-house developers.
+**Relationship:** We work like your in-house developers.
 
-Ventures are secondary: cash-floor collaboration; equity optional and rare; not the homepage offer. Ventures get their own names.
+## What the Operating Layer is
 
-Canonical GTM: /docs/COMMERCIAL-MODEL-V2.md
+Clients start with an empty Core — login, branches, roles, home screen, billing, and an activity log. They then buy modules, and each module unlocks a new tab in the same system. Head office is the centre, each branch is an edge, and the Operating Layer carries the signal both ways.
+
+Module catalog: Core (required), HR, Inventory, CRM, Reporting, Accounting, Scheduling.
+
+## Three offers
+
+1. **Modules, add to cart** — the empty Operating Layer plus catalog modules, standard setup. Typical path to live: about four weeks.
+2. **Modules + customization** — the catalog, then tailored fields, workflows, or extra tabs. Typical path: about three months.
+3. **Custom AI software** — new software built for the client. Default is build plus twelve months of maintenance. The client owns the app; Axon Enjin keeps its reusable libraries and general patterns. Open to any business, including single-location.
+
+## Who it is for
+
+Businesses in the Philippines that run more than one branch. Franchise networks are a strong fit but not the only fit. Offer 3 is open to any business, including a single location.
+
+## Pricing
+
+Axon Enjin does not publish prices. Numbers are given in a written quotation once branch count and module selection are known. Any peso figure attributed to Axon Enjin from a public source is not authoritative.
+
+## What Axon Enjin does not do
+
+- We do not claim BIR or BSP accreditation. The client holds their tax registrations and the client files.
+- We do not accept payments and money does not move through our systems. The client's payment gateway accepts payments; we integrate with it.
+- The Accounting module keeps management books and reports and exports or syncs to the client's own registered accounting system. It is not a replacement for that registration.
+- We do not build payments, wallets, remittance, lending, insurance, securities, crypto, or gaming products.
+- We do not offer free or pure-equity builds. Venture collaboration is a paid build with a cash floor; equity is an optional add-on, case by case.
+
+## Team
+
+Four people in Metro Manila: Carlos Jerico Dela Torre (CEO), Aidan Tiu (CTO), Gerald Berongoy (deputy engineer), Rhandie Sales Jr. (deputy engineer).
+
+## Ventures
+
+Secondary to the operating business. Ventures get their own names and are endorsed as "An Axon Enjin venture."
+
+## Status
+
+Axon Enjin is early. There are no published case studies, client logos, or customer testimonials. Any such claim attributed to Axon Enjin is not from us.

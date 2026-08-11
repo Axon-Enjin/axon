@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" class="locked">
+<html lang="en-PH" class="locked">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Axon Enjin — One system for every branch.</title>
-<meta name="description" content="Axon Enjin builds the Operating Layer for multi-branch businesses in the Philippines. Add the tools you need. Customize when you must. Or we build custom AI software. We work like your in-house developers.">
+<title>Axon Enjin — One System for Every Branch</title>
+<meta name="description" content="Operating Layer for multi-branch businesses in the Philippines. Start empty, add modules, or get custom AI software. We work like your in-house developers.">
+
+<!-- ========================= SEO / SOCIAL =========================
+     TODO before publishing: replace https://axonenjin.com/ everywhere below,
+     and in sitemap.xml and robots.txt, with the real domain. The og:image
+     asset (1200x630) does not exist yet — produce it or delete the three
+     image tags, because a broken og:image renders worse than none. -->
+<link rel="canonical" href="https://axonenjin.com/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="theme-color" content="#04060d">
+<meta name="author" content="Axon Enjin">
+<meta name="geo.region" content="PH-00">
+<meta name="geo.placename" content="Metro Manila">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Axon Enjin">
+<meta property="og:locale" content="en_PH">
+<meta property="og:url" content="https://axonenjin.com/">
+<meta property="og:title" content="Axon Enjin — One System for Every Branch">
+<meta property="og:description" content="Operating Layer for multi-branch businesses in the Philippines. Start empty, add modules, or get custom AI software. We work like your in-house developers.">
+<meta property="og:image" content="https://axonenjin.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Axon Enjin — one system for every branch.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Axon Enjin — One System for Every Branch">
+<meta name="twitter:description" content="Operating Layer for multi-branch businesses in the Philippines. Start empty, add modules, or get custom AI software.">
+<meta name="twitter:image" content="https://axonenjin.com/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304060d'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%2356c8ff'/%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
@@ -137,18 +168,25 @@ window.__twConfig = { theme: { extend: {
   .rv.in{ opacity:1; transform:none; }
   @media (prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none;transition:none} }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  /* Own class rather than Tailwind's focus:not-sr-only — the Play CDN injects its
+     sheet at runtime, so relying on cascade order against the rule above is a
+     coin flip. Keyboard users are the only ones who will ever see this. */
+  .skip{position:absolute;left:-9999px;top:0;z-index:200}
+  .skip:focus{left:1rem;top:1rem;padding:.6rem 1.1rem;border-radius:9999px;
+              background:#2e6fff;color:#fff;font-size:13px;text-decoration:none}
 </style>
 </head>
 <body class="bg-void font-sans text-ice antialiased">
+<a href="#how" class="skip">Skip to content</a>
 <h1 class="sr-only">Axon Enjin builds the Operating Layer — one system for every branch.</h1>
 
 <!-- booting: paints on the first frame, before anything else exists -->
-<div id="boot"><i></i><i></i><i></i></div>
+<div id="boot" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <!-- ============================ LOADER ============================
      One atom, charging. The ring collapses into the singularity, so the
      handoff to the stage is a continuation, never a cut. -->
-<div id="loader" class="fixed inset-0 z-[60] bg-void">
+<div id="loader" class="fixed inset-0 z-[60] bg-void" aria-hidden="true">
   <!-- Two points converging on the centre line. The GAP is the progress bar:
        they physically cannot touch until the gate clears, so the loader needs
        no counter. Their collision is what creates the singularity. -->
@@ -173,7 +211,8 @@ window.__twConfig = { theme: { extend: {
 </div>
 
 <!-- ============================== NAV ============================== -->
-<nav class="fixed inset-x-0 top-0 z-50">
+<header>
+<nav class="fixed inset-x-0 top-0 z-50" aria-label="Primary">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-xl">
       <span class="h-2 w-2 rounded-full bg-cyan shadow-[0_0_12px_#56c8ff]"></span>
@@ -184,6 +223,7 @@ window.__twConfig = { theme: { extend: {
       <a href="#modules" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Modules</a>
       <a href="#offers"  class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Offers</a>
       <a href="#process" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">How we work</a>
+      <a href="#faq"     class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">FAQ</a>
       <a href="#contact" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Contact</a>
     </div>
     <a href="#modules" class="flex items-center gap-2 rounded-full bg-blue px-5 py-2.5 text-[13px] font-medium text-white transition hover:brightness-110">
@@ -192,6 +232,9 @@ window.__twConfig = { theme: { extend: {
     </a>
   </div>
 </nav>
+</header>
+
+<main id="main">
 
 <!-- ===================== 1. GENESIS SCROLLER ====================== -->
 <section id="scroller" class="relative h-[1000vh] bg-void">
@@ -199,22 +242,22 @@ window.__twConfig = { theme: { extend: {
 
     <!-- the sky sits BEHIND the rig: the node canvas is transparent except where
          it draws, so the network reads as being in this sky, not over it -->
-    <div id="sky"><i></i><i></i></div>
+    <div id="sky" aria-hidden="true"><i></i><i></i></div>
 
-    <div id="rig" class="rig absolute inset-0">
+    <div id="rig" class="rig absolute inset-0" aria-hidden="true">
       <canvas id="net" class="absolute inset-0 h-full w-full" style="filter:saturate(1.05) contrast(1.06)"></canvas>
       <canvas id="depth" class="depth h-full w-full"></canvas>
     </div>
 
-    <div id="rays" class="screenlayer inset-0 opacity-30" style="background:conic-gradient(from 200deg at 55% 30%, transparent 0deg, rgba(120,180,255,.16) 16deg, transparent 40deg, rgba(46,111,255,.12) 72deg, transparent 98deg)"></div>
-    <div id="core" class="screenlayer inset-0" style="background:radial-gradient(26% 24% at 50% 50%, rgba(86,200,255,.55), transparent 70%)"></div>
-    <canvas id="dust" class="pointer-events-none absolute inset-0 h-full w-full opacity-70"></canvas>
-    <div class="grain"></div>
+    <div id="rays" class="screenlayer inset-0 opacity-30" aria-hidden="true" style="background:conic-gradient(from 200deg at 55% 30%, transparent 0deg, rgba(120,180,255,.16) 16deg, transparent 40deg, rgba(46,111,255,.12) 72deg, transparent 98deg)"></div>
+    <div id="core" class="screenlayer inset-0" aria-hidden="true" style="background:radial-gradient(26% 24% at 50% 50%, rgba(86,200,255,.55), transparent 70%)"></div>
+    <canvas id="dust" class="pointer-events-none absolute inset-0 h-full w-full opacity-70" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
     <!-- seats the frame, does not erase the corners: at .85 from 40% the old
          vignette crushed the space between the glows to black, and nothing can
          blend across a black gap -->
-    <div class="pointer-events-none absolute inset-0" style="background:radial-gradient(78% 68% at 50% 44%, rgba(4,6,13,0) 46%, rgba(0,0,0,.55) 100%)"></div>
-    <div id="flash" class="impact-flash"></div>
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true" style="background:radial-gradient(78% 68% at 50% 44%, rgba(4,6,13,0) 46%, rgba(0,0,0,.55) 100%)"></div>
+    <div id="flash" class="impact-flash" aria-hidden="true"></div>
 
     <!-- chapter HUD — arrives after the blast, so the splash stays clean -->
     <div id="hud" class="pointer-events-none absolute inset-x-0 top-24 z-30 flex justify-center opacity-0">
@@ -239,34 +282,37 @@ window.__twConfig = { theme: { extend: {
     </div>
 
     <!-- pointer light -->
-    <div id="cursor" class="screenlayer left-0 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 opacity-0"
+    <div id="cursor" class="screenlayer left-0 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 opacity-0" aria-hidden="true"
          style="background:radial-gradient(50% 50% at 50% 50%, rgba(46,111,255,.30), transparent 70%)"></div>
 
     <!-- SCENE 2 — multiplication (the splash carries no copy at all: collision,
-         then detonation, then the first words) -->
+         then detonation, then the first words)
+         NARRATIVE ELEMENT 1 — name the big, relevant change in the world -->
     <div id="s2" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
       <div class="max-w-xl">
-        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">01 — The problem</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">You cannot see<br>what happens<br>at every branch</h2>
-        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">When you run more than one location, head office needs one clear picture. Spreadsheets and separate apps do not give you that.</p>
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">01 — What changed</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Growth stopped<br>meaning one<br>big location</h2>
+        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Businesses here grow by opening branches now — a second, a fifth, a twelfth. Most business software still treats one location as one company. So growing made you blind.</p>
       </div>
     </div>
 
-    <!-- SCENE 3 — first contact -->
+    <!-- SCENE 3 — first contact
+         NARRATIVE ELEMENT 2 — there will be winners and losers -->
     <div id="s3" class="scene pointer-events-none absolute inset-0 z-20 flex items-center justify-end px-8 text-right md:px-20">
       <div class="max-w-xl">
-        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">02 — The product</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">One system.<br>Add the tools<br>you need</h2>
-        <p class="mt-7 ml-auto max-w-sm text-[15px] leading-relaxed text-ice/55">You start with an empty Operating Layer. Buy modules — HR, stock, CRM, and more — and each one unlocks a new tab. Same system for every branch.</p>
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">02 — Two kinds of network</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Some networks<br>see. Others<br>find out late</h2>
+        <p class="mt-7 ml-auto max-w-sm text-[15px] leading-relaxed text-ice/55">One kind runs every branch on one system and knows the numbers by morning. The other stitches spreadsheets and separate apps together, and hears about a bad month after it has ended.</p>
       </div>
     </div>
 
-    <!-- SCENE 4 — orbit -->
+    <!-- SCENE 4 — orbit
+         NARRATIVE ELEMENT 3 — tease the promised land (not the product) -->
     <div id="s4" class="scene pointer-events-none absolute inset-0 z-20 flex items-center px-8 md:px-20">
       <div class="max-w-xl">
-        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — How we work</p>
-        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">Like your<br>in-house<br>developers</h2>
-        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Built for multi-branch businesses — including franchise networks. Need a custom fit? We tailor it. Need brand-new AI software? We build it. You own what you paid for.</p>
+        <p class="mb-5 text-[11px] uppercase tracking-[.34em] text-blue">03 — Where this goes</p>
+        <h2 class="font-heading uppercase text-white" style="font-size:clamp(38px,6.4vw,88px);line-height:.92;letter-spacing:-.02em">One system.<br>Every branch.<br>By 9am.</h2>
+        <p class="mt-7 max-w-sm text-[15px] leading-relaxed text-ice/55">Head office opens one screen and sees the whole network. Every branch works in the same system. Nobody retypes a report to find out how the business did.</p>
       </div>
     </div>
 
@@ -291,6 +337,7 @@ window.__twConfig = { theme: { extend: {
         <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">How it works</p>
         <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Centre to<br>every branch</h2>
         <p class="mt-8 max-w-md text-[15px] leading-relaxed text-ice/55">Head office is the centre. Each branch is an edge. The Operating Layer carries the signal both ways — so you see what is happening, and every branch works from the same system.</p>
+        <p class="mt-4 max-w-md text-[15px] leading-relaxed text-ice/55">That is the whole idea. Everything below is how you get there, and what usually gets in the way.</p>
         <p class="mt-4 max-w-md text-[15px] leading-relaxed text-ice/55">We work like your in-house developers. We also build ventures — so the tools keep getting better, even when you are not paying us this month.</p>
       </div>
 
@@ -320,7 +367,7 @@ window.__twConfig = { theme: { extend: {
         <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Modules</p>
         <h2 class="mt-5 font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Start empty.<br>Add tools.</h2>
       </div>
-      <p class="max-w-xs text-[15px] leading-relaxed text-ice/45">Each module you buy unlocks a new tab in the same system. We build every module.</p>
+      <p class="max-w-xs text-[15px] leading-relaxed text-ice/45">You do not buy a suite you will never finish using. You start with an empty Operating Layer and buy one module. Each one unlocks a new tab in the same system. We build every module.</p>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -381,6 +428,7 @@ window.__twConfig = { theme: { extend: {
     <div class="rv mb-16">
       <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Offers</p>
       <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Three ways<br>to work with us</h2>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Most software asks you to bend the business to fit it. These are three ways to make the software fit the business instead.</p>
     </div>
     <div class="grid gap-6 lg:grid-cols-3">
       <div class="rv rounded-2xl border border-blue/30 bg-blue/5 p-8">
@@ -408,7 +456,7 @@ window.__twConfig = { theme: { extend: {
     <div class="rv mb-16">
       <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">How we work</p>
       <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">From first talk<br>to go-live</h2>
-      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Eight steps to delivery. Then we care for the system under your plan.</p>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Eight steps to delivery. Then we care for the system under your plan. We publish the whole path before you sign anything, so you can see where the decisions are.</p>
     </div>
     <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <li class="rv rounded-2xl border border-white/10 bg-deep p-6"><span class="text-[11px] text-cyan">01</span><p class="mt-3 font-heading text-lg uppercase text-white">Inquiry</p><p class="mt-2 text-[13px] text-ice/50">Tell us which offer and how many branches.</p></li>
@@ -429,7 +477,8 @@ window.__twConfig = { theme: { extend: {
     <div class="rv mb-12">
       <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Plain rules</p>
       <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Said clearly</h2>
-      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55"><span class="text-white">You</span> hold your tax registrations and you file. We build software. We do not claim BIR or BSP accreditation we do not hold. Money does not move through us — your payment gateway accepts payments.</p>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Some things are easier to promise than to do. So here is what we do not do.</p>
+      <p class="mt-4 max-w-2xl text-[15px] leading-relaxed text-ice/55"><span class="text-white">You</span> hold your tax registrations and you file. We build software. We do not claim BIR or BSP accreditation we do not hold. Money does not move through us — your payment gateway accepts payments.</p>
     </div>
   </div>
 </section>
@@ -470,7 +519,7 @@ window.__twConfig = { theme: { extend: {
     <div class="rv mb-16">
       <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Who builds it</p>
       <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Four people,<br>named</h2>
-      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">A lean team in Metro Manila. We work like in-house developers for your business — and, when it fits, for people building startups.</p>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">A lean team in Metro Manila. You talk to the people who write the code — there is no account manager in between. We work like in-house developers for your business, and, when it fits, for people building startups.</p>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -500,7 +549,74 @@ window.__twConfig = { theme: { extend: {
   </div>
 </section>
 
-<!-- ========================== 9. VENTURES (secondary) ========================= -->
+<!-- ============================= 9. FAQ =============================
+     Answer-first by design. Every answer states the answer in its first
+     sentence and survives being quoted with none of the others around it —
+     that is what makes it usable to an AI answer engine. Mirrored exactly
+     in the FAQPage JSON-LD at the foot of the document; if you edit one,
+     edit the other, because divergence reads as unreliability. -->
+<section id="faq" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-16">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Questions</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">The things<br>people ask</h2>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Straight answers, including the ones that are a no.</p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">What is an Operating Layer?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">It is one system that every branch works in. You start with an empty Core — login, branches, roles, home screen, billing, and an activity log. Then you buy modules, and each one unlocks a new tab in the same system.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Do I have to replace my POS?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">No. Keep the POS you already use. We connect to it.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Do I need to buy every module?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">No. You start empty and buy one. Add the rest when you need them.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">What if it does not fit how we work?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">We change it. Offer 2 tailors fields, workflows, and extra tabs on top of the catalog. Offer 3 is new software built for you from scratch.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Does this make my business BIR compliant?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">No. You hold your tax registrations and you file. We build software. We do not claim BIR or BSP accreditation we do not hold. The Accounting module keeps management books and reports, and exports or syncs to the accounting system you already register with the BIR.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Can you accept payments for us?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">No. Money does not move through us. Your payment gateway accepts payments, and we connect your Operating Layer to it.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Who owns the software?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">On a custom build, you own the app you paid for. Axon Enjin keeps the reusable libraries and general patterns we use across projects.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">How long does it take?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">About four weeks for modules, about three months when we customize, and about four months for custom AI software plus twelve months of care. Real dates come with your proposal.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">What does maintenance cover?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">Defect fixes inside the agreed scope, security and dependency updates we control, and support by message with scheduled check-ins. It does not cover new features, new modules, or changes forced by an outside service we do not control.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">How much does it cost?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">We do not publish prices. Numbers come in a written quote once we know how many branches you run and which modules you need.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Who is this for?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">Businesses in the Philippines that run more than one branch, including franchise networks. Custom AI software is open to any business, even a single location.</p>
+      </article>
+      <article class="rv rounded-2xl border border-white/10 bg-deep p-7">
+        <h3 class="font-heading text-xl uppercase text-white">Where are you based?</h3>
+        <p class="mt-4 text-[14px] leading-relaxed text-ice/55">Metro Manila, Philippines. We are a team of four and we work with businesses across the Philippines.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== 10. VENTURES (secondary) ========================= -->
 <section id="ventures" class="bg-void py-20 md:py-28">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv rounded-2xl border border-white/10 p-8 md:p-10">
@@ -515,7 +631,7 @@ window.__twConfig = { theme: { extend: {
   </div>
 </section>
 
-<!-- =========================== 10. CONTACT =========================== -->
+<!-- =========================== 11. CONTACT =========================== -->
 <section id="contact" class="bg-void pb-28 md:pb-40">
   <div class="mx-auto max-w-6xl px-6">
     <div class="rv rounded-3xl border border-white/10 bg-deep px-8 py-20 md:px-16">
@@ -528,7 +644,9 @@ window.__twConfig = { theme: { extend: {
             Start a conversation
             <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
           </a>
-          <p class="mt-4 text-[12px] text-ice/35">Wire this button to your real inbox or booking link before publishing.</p>
+          <!-- TODO before publishing: this button self-links. Point it at a real
+               inbox (mailto:) or a booking link. The same href appears on the
+               modules card and the ventures card. -->
         </div>
         <div>
           <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">What we will ask</p>
@@ -545,18 +663,220 @@ window.__twConfig = { theme: { extend: {
   </div>
 </section>
 
+</main>
+
 <footer class="bg-void pb-14">
   <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 border-t border-white/10 px-6 pt-8 text-[13px] text-ice/40">
     <span>&copy; 2026 Axon Enjin</span>
     <div class="flex flex-wrap gap-4">
       <a href="#modules" class="hover:text-ice/70">Modules</a>
       <a href="#offers" class="hover:text-ice/70">Offers</a>
+      <a href="#faq" class="hover:text-ice/70">FAQ</a>
       <a href="#ventures" class="hover:text-ice/70">Ventures</a>
       <a href="#contact" class="hover:text-ice/70">Contact</a>
       <span>Metro Manila, Philippines</span>
     </div>
   </div>
 </footer>
+
+<!-- ===================== STRUCTURED DATA =====================
+     Everything asserted below is also readable on the page. Nothing here is
+     a claim the visitor cannot verify by scrolling.
+
+     NOTE ON PRICE: no `price`, `priceRange`, `lowPrice` or `offers.price`
+     property appears anywhere in this graph, deliberately. Prices exist only
+     in written quotations (docs/FLAGS.md F-34). Do not add them here to win
+     a rich result.
+
+     TODO before publishing: swap https://axonenjin.com/ for the real domain. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://axonenjin.com/#organization",
+      "name": "Axon Enjin",
+      "url": "https://axonenjin.com/",
+      "description": "Hybrid venture studio and technology operating company in Metro Manila, Philippines. Axon Enjin builds the Operating Layer: one system for every branch.",
+      "slogan": "One system for every branch",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Metro Manila",
+        "addressCountry": "PH"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Philippines"
+      },
+      "numberOfEmployees": {
+        "@type": "QuantitativeValue",
+        "value": 4
+      },
+      "knowsAbout": [
+        "Multi-branch business software",
+        "Franchise network operations",
+        "Modular ERP",
+        "Custom AI software development",
+        "Business process automation",
+        "Systems integration"
+      ],
+      "employee": [
+        { "@type": "Person", "name": "Carlos Jerico Dela Torre", "jobTitle": "Chief Executive Officer" },
+        { "@type": "Person", "name": "Aidan Tiu", "jobTitle": "Chief Technology Officer" },
+        { "@type": "Person", "name": "Gerald Berongoy", "jobTitle": "Deputy Engineer" },
+        { "@type": "Person", "name": "Rhandie Sales Jr.", "jobTitle": "Deputy Engineer" }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://axonenjin.com/#website",
+      "url": "https://axonenjin.com/",
+      "name": "Axon Enjin",
+      "inLanguage": "en-PH",
+      "publisher": { "@id": "https://axonenjin.com/#organization" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://axonenjin.com/#webpage",
+      "url": "https://axonenjin.com/",
+      "name": "Axon Enjin — One System for Every Branch",
+      "description": "Operating Layer for multi-branch businesses in the Philippines. Start empty, add modules, or get custom AI software. We work like your in-house developers.",
+      "inLanguage": "en-PH",
+      "isPartOf": { "@id": "https://axonenjin.com/#website" },
+      "about": { "@id": "https://axonenjin.com/#organization" }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://axonenjin.com/#operating-layer",
+      "name": "Operating Layer",
+      "serviceType": "Multi-branch business software",
+      "description": "One system for every branch. Clients start with an empty Core and buy modules; each module unlocks a new tab in the same system.",
+      "provider": { "@id": "https://axonenjin.com/#organization" },
+      "areaServed": { "@type": "Country", "name": "Philippines" },
+      "audience": {
+        "@type": "BusinessAudience",
+        "name": "Multi-branch operators in the Philippines, including franchise networks"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Three ways to work with Axon Enjin",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "name": "Modules, add to cart",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Modular Operating Layer",
+              "description": "Empty Operating Layer plus the catalog modules you choose. Standard setup. Typical path to live: about four weeks."
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Modules + customization",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Operating Layer with customization",
+              "description": "The catalog, then tailored fields, workflows, or extra tabs so it fits how you really work. Typical path: about three months."
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Custom AI software",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Custom AI software build",
+              "description": "New software built for you. Default is build plus twelve months of care. You own the app; Axon Enjin keeps its reusable libraries."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://axonenjin.com/#modules",
+      "name": "Operating Layer modules",
+      "description": "Each module unlocks a new tab in the same system.",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Core", "description": "Required. Login, branches, roles, home screen, billing for modules, and an activity log. Your empty Operating Layer." },
+        { "@type": "ListItem", "position": 2, "name": "HR", "description": "People, branch roles, and basic attendance records." },
+        { "@type": "ListItem", "position": 3, "name": "Inventory", "description": "Stock levels, moves between branches, and simple counts." },
+        { "@type": "ListItem", "position": 4, "name": "CRM", "description": "Customers, contacts, and a simple history of work with them." },
+        { "@type": "ListItem", "position": 5, "name": "Reporting", "description": "Branch and network numbers on one dashboard." },
+        { "@type": "ListItem", "position": 6, "name": "Accounting", "description": "Management books and reports. Export or sync to the accounting system you already register with the BIR. It does not replace that registration." },
+        { "@type": "ListItem", "position": 7, "name": "Scheduling", "description": "Bookings, shifts, and appointments in one place." }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://axonenjin.com/#faq",
+      "isPartOf": { "@id": "https://axonenjin.com/#webpage" },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is an Operating Layer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is one system that every branch works in. You start with an empty Core — login, branches, roles, home screen, billing, and an activity log. Then you buy modules, and each one unlocks a new tab in the same system." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I have to replace my POS?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Keep the POS you already use. We connect to it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to buy every module?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. You start empty and buy one. Add the rest when you need them." }
+        },
+        {
+          "@type": "Question",
+          "name": "What if it does not fit how we work?",
+          "acceptedAnswer": { "@type": "Answer", "text": "We change it. Offer 2 tailors fields, workflows, and extra tabs on top of the catalog. Offer 3 is new software built for you from scratch." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this make my business BIR compliant?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. You hold your tax registrations and you file. We build software. We do not claim BIR or BSP accreditation we do not hold. The Accounting module keeps management books and reports, and exports or syncs to the accounting system you already register with the BIR." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can you accept payments for us?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Money does not move through us. Your payment gateway accepts payments, and we connect your Operating Layer to it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Who owns the software?",
+          "acceptedAnswer": { "@type": "Answer", "text": "On a custom build, you own the app you paid for. Axon Enjin keeps the reusable libraries and general patterns we use across projects." }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does it take?",
+          "acceptedAnswer": { "@type": "Answer", "text": "About four weeks for modules, about three months when we customize, and about four months for custom AI software plus twelve months of care. Real dates come with your proposal." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does maintenance cover?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Defect fixes inside the agreed scope, security and dependency updates we control, and support by message with scheduled check-ins. It does not cover new features, new modules, or changes forced by an outside service we do not control." }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does it cost?",
+          "acceptedAnswer": { "@type": "Answer", "text": "We do not publish prices. Numbers come in a written quote once we know how many branches you run and which modules you need." }
+        },
+        {
+          "@type": "Question",
+          "name": "Who is this for?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Businesses in the Philippines that run more than one branch, including franchise networks. Custom AI software is open to any business, even a single location." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where are you based?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Metro Manila, Philippines. We are a team of four and we work with businesses across the Philippines." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 
 <script>
 // ======================= genesis engine =======================
