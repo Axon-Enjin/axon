@@ -1,0 +1,29 @@
+# Website Grounding Manifest
+# Mirrored to Axon-Enjin/axon → docs/grounding/
+
+pack_version: "1.0.0"
+exported: "2026-08-11"
+authority: level-2
+source_repo: Axon-Enjin/company-docs
+consumer_repo: Axon-Enjin/axon
+consumer_path: docs/grounding/
+
+files:
+  - WEBSITE-CONTRACT.md
+  - COMMERCIAL-MODEL-V2.md
+  - SITEMAP.md
+  - BRAND-VOICE.md
+  - MODULE-CATALOG.md
+  - GROUNDING-MANIFEST.yml
+  - README.md
+
+authority_sources:
+  commercial_model: 01_STRATEGY/COMMERCIAL-MODEL-V2.md
+  sitemap: 11_MARKETING/SITEMAP.md
+  canonical_voice: 01_STRATEGY/AXON-ENJIN-CANONICAL.md#§2.4
+  flags: 00_GOVERNANCE/FLAGS.md
+
+rules:
+  - No peso or currency prices in any mirrored file intended for public copy.
+  - Do not add client-confidential files to this pack.
+  - Changes to this pack open a PR on Axon-Enjin/axon; no silent overwrite.

@@ -8,4 +8,6 @@ Primary buyers: multi-branch operators (including franchise networks). We work l
 
 Ventures are secondary: cash-floor collaboration; equity optional and rare; not the homepage offer. Ventures get their own names.
 
-Canonical GTM: /docs/COMMERCIAL-MODEL-V2.md
+Canonical GTM: /docs/grounding/COMMERCIAL-MODEL-V2.md
+Website contract: /docs/grounding/WEBSITE-CONTRACT.md
+Company OS (private): https://github.com/Axon-Enjin/company-docs

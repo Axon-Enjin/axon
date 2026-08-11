@@ -1,0 +1,16 @@
+---
+description: Website copy must follow company-docs grounding pack only
+globs:
+  - "**/*.{html,md,txt}"
+alwaysApply: true
+---
+
+# Website grounding rules
+
+- Company doctrine lives in private `Axon-Enjin/company-docs`.
+- For customer-facing copy and IA, read only `docs/grounding/` — especially `WEBSITE-CONTRACT.md` and `COMMERCIAL-MODEL-V2.md`.
+- Never invent prices, compliance claims, or payment acceptance.
+- No peso/currency amounts on the public site (F-34).
+- Ventures are secondary (footer / About only).
+- If grounding conflicts with live HTML, flag it — do not silently invent a third doctrine.
+- Do not treat `docs/_retired-to-company-docs/` as source of truth.

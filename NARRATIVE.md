@@ -1,6 +1,6 @@
 # Axon Enjin — Landing Page Content (Commercial Model v2)
 
-**Governed by:** [`docs/COMMERCIAL-MODEL-V2.md`](docs/COMMERCIAL-MODEL-V2.md) · [`docs/SITEMAP.md`](docs/SITEMAP.md)  
+**Governed by:** [`docs/grounding/COMMERCIAL-MODEL-V2.md`](docs/grounding/COMMERCIAL-MODEL-V2.md) · [`docs/grounding/SITEMAP.md`](docs/grounding/SITEMAP.md) · [`docs/grounding/WEBSITE-CONTRACT.md`](docs/grounding/WEBSITE-CONTRACT.md)  
 **Voice:** Plain language (5th–7th grade). Short sentences.  
 **Audience:** Multi-branch operators in the Philippines (franchise is a strong fit, not the only word). Secondary: custom AI buyers and filtered startup collab.
 

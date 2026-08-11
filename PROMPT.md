@@ -9,7 +9,8 @@ The result must be a cinematic, scroll-driven creation myth: **one node sparks, 
 
 Visual fidelity rules below still apply. **Copy and IA follow Commercial Model v2**, not the old audit ladder.
 
-- **Source of truth for offers/copy:** [`docs/COMMERCIAL-MODEL-V2.md`](docs/COMMERCIAL-MODEL-V2.md), [`docs/SITEMAP.md`](docs/SITEMAP.md), [`NARRATIVE.md`](NARRATIVE.md)
+- **Source of truth for offers/copy:** [`docs/grounding/COMMERCIAL-MODEL-V2.md`](docs/grounding/COMMERCIAL-MODEL-V2.md), [`docs/grounding/SITEMAP.md`](docs/grounding/SITEMAP.md), [`docs/grounding/WEBSITE-CONTRACT.md`](docs/grounding/WEBSITE-CONTRACT.md), [`NARRATIVE.md`](NARRATIVE.md)
+- **Company OS (private):** [Axon-Enjin/company-docs](https://github.com/Axon-Enjin/company-docs) — do not treat retired local docs as SoT
 - **Product name:** Operating Layer — *One system for every branch. Add the tools you need.*
 - **Three offers only:** modules (add to cart) · modules + customization · custom AI (Build + 12 mo; client owns app)
 - **Ventures:** secondary (footer / late section only); cash floor; no pure-equity CTA
