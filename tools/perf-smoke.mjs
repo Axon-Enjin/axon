@@ -93,8 +93,47 @@ const writes = g(`(() => { let c = 0;
   return c; })()`);
 assert.strictEqual(writes, 1, `set() memo failed: ${writes} writes for 50 identical values`);
 
-// ---- watchdog steps down, and only down -----------------------------------
-vm.runInContext('TIER = 1; applyTier();', ctx);
+// ---- watchdog: a healthy-but-jittery machine must NOT be downgraded --------
+// This is the case that a rolling MEAN got wrong. Measured on a machine holding
+// a clean 60fps: p50 16.7ms, p90 16.9ms, ~2% of frames hitching to 33-50ms.
+// That profile must survive 600 frames untouched.
+{
+  const before = g('TIER');
+  let ms = 100000;
+  for (let i = 0; i < 600 && raf.length; i++) {
+    ms += i % 50 === 0 ? 42 : 16.7;                       // one hitch every 50 frames
+    raf.shift()(ms);
+  }
+  assert.strictEqual(g('TIER'), before,
+    'watchdog downgraded a machine running at 60fps with occasional hitches');
+}
+
+// ---- watchdog: a machine that stutters every other frame MUST step down ----
+// Alternating 16.7/33.3 is an effective 45fps and reads as visible stutter, but
+// half its frames are perfect. A "count the slow frames" rule tuned loose enough
+// to survive the jitter case above would sit right on top of this one; a median
+// separates them cleanly.
+{
+  const before = g('TIER');
+  let ms = 200000;
+  for (let i = 0; i < 200 && raf.length; i++) { ms += i % 2 ? 33.3 : 16.7; raf.shift()(ms); }
+  assert.ok(g('TIER') < before, 'watchdog missed a machine stuttering at ~45fps');
+}
+
+// ---- watchdog: a genuinely slow machine MUST be downgraded ----------------
+{
+  const before = g('TIER');
+  let ms = 400000;
+  for (let i = 0; i < 200 && raf.length; i++) { ms += 40; raf.shift()(ms); }
+  assert.ok(g('TIER') < before,
+    'watchdog failed to step down on a machine rendering at 25fps');
+}
+
+// ---- the tier table --------------------------------------------------------
+// `reduce` is a latch by design — nothing un-sets it in the product, because the
+// tier only ever falls. The watchdog cases above may have already tripped it, so
+// clear it here to test the table itself rather than the order of this file.
+vm.runInContext('reduce = false; TIER = 1; applyTier();', ctx);
 assert.strictEqual(g('Q.echo'), false, 'tier 1 drops the blurred depth echo');
 assert.strictEqual(g('Q.dpr'), 1, 'tier 1 clamps dpr to 1');
 assert.strictEqual(g('reduce'), false, 'tier 1 is not the reduced-motion path');

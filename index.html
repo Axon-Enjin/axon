@@ -1348,7 +1348,11 @@ function setScene(el, o, ty, blur, tx){
 }
 
 let lastChapter = '', tLoad = 0, tClose = 0, tBoot = 0, tCollapse = 0, p = 0, lastGap = 0, tPrev = 0;
-let fAcc = 0, fN = 0, slowRuns = 0;             // frame-time watchdog accumulators
+// Watchdog state. Float32Array so .sort() is numeric — Array.prototype.sort on
+// a plain array is LEXICOGRAPHIC by default and would put .1 before .05.
+const FW = 32;
+const fWin = new Float32Array(FW);
+let fN = 0, slowRuns = 0;
 // The stage is the only thing on the page that costs anything to render, and it
 // is a sticky element inside the FIRST section of ten. Once it leaves the
 // viewport the loop stops dead, so the nine flat content sections scroll against
@@ -1417,19 +1421,28 @@ function frame(ms){
   const dt = tPrev ? Math.min(t - tPrev, .05) : 1/60; tPrev = t;
 
   // ---- WATCHDOG --------------------------------------------------------
-  // The device hints only guessed. This is the measurement that corrects them:
-  // a 16-frame rolling mean, and two consecutive slow windows step the tier
-  // down. ONE WAY ONLY — an upgrade path would oscillate the moment the lighter
-  // tier ran fast enough to qualify for the heavier one again.
-  // Skipped while `booting`: the blast is legitimately the heaviest moment on
-  // the page and would trip this on hardware that handles the rest fine.
-  // ponytail: fixed 22ms threshold, not refresh-rate aware. A 120Hz panel wants
+  // The device hints only guessed. This is the measurement that corrects them.
+  //
+  // The statistic is the MEDIAN frame time of the window, not the mean. This is
+  // not fussiness: measured on a machine holding a clean 60fps (p50 16.7ms, p90
+  // 16.9ms), the occasional 33-50ms hitch from GC or a scroll dragged a rolling
+  // MEAN over budget often enough to ratchet the tier 3 -> 1 on hardware that
+  // was never struggling. A median cannot be moved by a few outliers at all, and
+  // it answers the only question that matters directly: is the TYPICAL frame
+  // slow? Sorting 32 floats once every 32 frames costs nothing.
+  //
+  // Two consecutive bad windows, and ONE WAY ONLY — an upgrade path would
+  // oscillate the moment the lighter tier ran fast enough to re-qualify for the
+  // heavier one. Skipped while `booting`: the blast is legitimately the heaviest
+  // moment on the page and would trip this on hardware that handles the rest fine.
+  // ponytail: fixed 22ms budget, not refresh-rate aware. A 120Hz panel wants
   // ~8ms; add screen.refreshRate gating only if someone actually complains.
   if (!booting && TIER > 0){
-    fAcc += dt;
-    if (++fN === 16){
-      slowRuns = fAcc/16 > .022 ? slowRuns + 1 : 0;
-      fAcc = 0; fN = 0;
+    fWin[fN] = dt;
+    if (++fN === FW){
+      fN = 0;
+      const median = fWin.slice().sort()[FW>>1];
+      slowRuns = median > .022 ? slowRuns + 1 : 0;
       if (slowRuns >= 2){ slowRuns = 0; TIER--; applyTier(); resize(); }
     }
   }
