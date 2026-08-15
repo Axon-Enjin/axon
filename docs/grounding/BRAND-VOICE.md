@@ -5,7 +5,7 @@ status: active
 authority: level-2
 owner: Jerico
 created: 2026-08-11
-updated: 2026-08-11
+updated: 2026-08-15
 review_cycle: 90-days
 source_of_truth: 11_MARKETING/website-grounding/BRAND-VOICE.md
 supersedes:
@@ -14,13 +14,26 @@ superseded_by:
 
 # Brand Voice — Website
 
-> Derived summary for website authors. Canonical voice rules: Company Document §2.4 (private OS). Hard GTM rules: `COMMERCIAL-MODEL-V2.md` §8.
+> Derived summary for website authors. Canonical voice rules: Company Document §2.4 (private OS). Hard GTM rules: `COMMERCIAL-MODEL-V2.md` §8. Owner-facing clarity: private OS `11_MARKETING/POSITIONING.md`.
 
 ## Plain language
 
 - Write so a **5th–7th grader** can follow.
 - Short words. Short sentences.
 - Teach hard words only once, if at all.
+
+## Two hosts
+
+Company H1 (*The one who connects.*) lives on `axonenjin.com`. Product name (**Axlefield**) lives on `axlefield.axonenjin.com`. Do not mix them as one homepage title.
+
+## Lead lines
+
+- Company H1: *The one who connects.* (D-2026-008)
+- Product: **Axlefield** (D-2026-009) — *An Axon Enjin product.*
+- Product explainer: *Add the tools you need.* / *One system for every branch. Add the tools you need.*
+- *We work like your in-house developers.*
+- Hero stack: *The one who connects.* / **Axlefield.** / *Add the tools you need.* / *We work like your in-house developers.*
+- Platform success breath (not H1): *One system for every branch. Add tools. Or we build custom AI. We work like your in-house developers.*
 
 ## Tone
 
@@ -38,3 +51,9 @@ superseded_by:
 
 - No currency amounts on the public site (F-34).
 - Use “talk to us” / quotation language.
+
+## Competitor voice (public site)
+
+- Do **not** name Odoo, Zoho, NetSuite, ERPNext, or local vendors on the website.
+- Describe the job: one system for every branch; add tools; build what’s missing.
+- Product name: **Axlefield**. Do **not** use “Agentic AI Systems” as the company tagline. Do **not** call the product Axon Enjin.

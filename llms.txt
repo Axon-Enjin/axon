@@ -1,13 +1,25 @@
 # Axon Enjin
 
-> Hybrid venture studio and technology company in Metro Manila, Philippines.
+> The one who connects.
 
-Axon Enjin builds the **Operating Layer**: one system for every branch. Clients start with an empty Core, then buy modules (HR, Inventory, CRM, Reporting, Accounting, Scheduling). We also customize modules and build custom AI software (build + 12 months maintenance by default; client owns the app; Axon keeps reusable libraries).
+Axon Enjin is the **company**: a hybrid venture studio and technology company in Metro Manila, Philippines. We work like in-house developers.
 
-Primary buyers: multi-branch operators (including franchise networks). We work like in-house developers.
+**Axlefield** is the **product** — an Axon Enjin product. One system for every branch. Clients start with an empty Core, then add modules (HR, Inventory, CRM, Reporting, Accounting, Scheduling). The Axlefield site is planned at https://axlefield.axonenjin.com/ and is **not shipped yet**. Do not treat that origin as a live URL.
 
-Ventures are secondary: cash-floor collaboration; equity optional and rare; not the homepage offer. Ventures get their own names.
+This company site (https://axonenjin.com/) is the public company story. Ventures are secondary here (Collaborate / footer only). Ventures get their own names; do not invent named ventures.
 
-Canonical GTM: /docs/grounding/COMMERCIAL-MODEL-V2.md
-Website contract: /docs/grounding/WEBSITE-CONTRACT.md
+## Three offers (no prices on the public site)
+
+1. Modular Axlefield — Core plus catalog modules (add to cart).
+2. Axlefield plus customization — same system, tailored.
+3. Custom AI / custom software — build plus 12 months maintenance by default; the client owns the app; Axon keeps reusable libraries.
+
+Primary buyers: multi-branch operators (including franchise networks).
+
+## Canonical docs (grounding)
+
+- /docs/grounding/COMMERCIAL-MODEL-V2.md
+- /docs/grounding/WEBSITE-CONTRACT.md
+- /docs/grounding/SITEMAP.md
+
 Company OS (private): https://github.com/Axon-Enjin/company-docs

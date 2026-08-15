@@ -5,7 +5,7 @@ status: active
 authority: level-2
 owner: Jerico
 created: 2026-08-11
-updated: 2026-08-11
+updated: 2026-08-15
 review_cycle: 90-days
 source_of_truth: 11_MARKETING/website-grounding/README.md
 supersedes:
@@ -15,6 +15,8 @@ superseded_by:
 # Website Grounding Pack
 
 This folder is the **only** surface of `company-docs` that may be mirrored to the public website repository (`Axon-Enjin/website`).
+
+Public IA is **two properties**: company (`axonenjin.com`) vs product (`axlefield.axonenjin.com`). See `WEBSITE-CONTRACT.md` and `SITEMAP.md` v3.
 
 ## Why this exists
 

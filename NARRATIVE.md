@@ -6,16 +6,18 @@
 
 > This file **supersedes** the earlier generic “custom software / BPA agency” draft and the audit-first narrative.
 
+**Interim debt:** Live `index.html` section bodies (scroller, modules, offers, and related copy) may still say Operating Layer until the Axlefield product site exists. Header/footer nav is already v3 company IA (About · Axlefield · Contact). Do not treat leftover Operating Layer body copy as current homepage doctrine.
+
 ---
 
 ## SEO + AISO
 
-**Page title (≤60):** `Axon Enjin — One system for every branch`  
-**Meta description (≤155):** `Operating Layer for multi-branch businesses. Add modules, customize, or get custom AI software. In-house developers for your network.`
+**Page title (≤60):** `Axon Enjin — The one who connects.`  
+**Meta description (≤155):** `Axon Enjin is the company behind Axlefield — software for multi-branch operators. Talk to us.`
 
-**H1 (real DOM):** `Axon Enjin builds the Operating Layer — one system for every branch.`
+**H1 (real DOM):** `The one who connects.`
 
-**Keywords:** operating layer multi-branch Philippines, modular ERP modules, custom AI software Philippines, multi-branch business software
+**Keywords:** Axon Enjin, Axlefield, multi-branch Philippines, talk to us
 
 ---
 

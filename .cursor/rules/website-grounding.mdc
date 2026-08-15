@@ -8,9 +8,10 @@ alwaysApply: true
 # Website grounding rules
 
 - Company doctrine lives in private `Axon-Enjin/company-docs`.
-- For customer-facing copy and IA, read only `docs/grounding/` — especially `WEBSITE-CONTRACT.md` and `COMMERCIAL-MODEL-V2.md`.
+- For customer-facing copy and IA, read only `docs/grounding/` — especially `WEBSITE-CONTRACT.md`, `COMMERCIAL-MODEL-V2.md`, and `SITEMAP.md`.
+- IA is two-property: `axonenjin.com` (company) and `axlefield.axonenjin.com` (product). Do not merge them into one public nav.
 - Never invent prices, compliance claims, or payment acceptance.
 - No peso/currency amounts on the public site (F-34).
-- Ventures are secondary (footer / About only).
+- Ventures are secondary on the **company** site (Collaborate / footer only). Never on Axlefield primary nav or as an equal CTA.
 - If grounding conflicts with live HTML, flag it — do not silently invent a third doctrine.
 - Do not treat `docs/_retired-to-company-docs/` as source of truth.
