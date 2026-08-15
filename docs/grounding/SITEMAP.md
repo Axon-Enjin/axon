@@ -5,7 +5,7 @@ status: active
 authority: level-2
 owner: Rhandie
 created: 2026-08-08
-updated: 2026-08-11
+updated: 2026-08-15
 review_cycle: 90-days
 source_of_truth: 11_MARKETING/SITEMAP.md
 supersedes:
@@ -25,11 +25,11 @@ superseded_by:
 
 ## 1. The one decision that shapes everything
 
-**The site’s job is to sell the Operating Layer** — one system for every branch — via a **module catalog** and **three offers**. It is **not** built to sell a ₱95,000 Readiness Audit.
+**The site’s job is to sell Axlefield** — one system for every branch — via a **module catalog** and **three offers**. It is **not** built to sell a ₱95,000 Readiness Audit.
 
 | Old site Cv1) | This site Cv2) |
 | ----- | ----- |
-| Hero → Book a Readiness Audit | Hero → Operating Layer + talk to us / see modules |
+| Hero → Book a Readiness Audit | Hero → Axlefield + talk to us / see modules |
 | Archetype hub as main event | Module catalog as main product surface |
 | 5-rung service ladder | Three offers only |
 | Platform rate card hidden; audit priced | Modules listed; **no pesos on site** — prices in quotations only CF-34) |
@@ -42,9 +42,9 @@ superseded_by:
 ## 2. Site map
 
 ```
-/                                   Home — Operating Layer, three offers, primary CTA
+/                                   Home — Axlefield, three offers, primary CTA
 │
-├── /platform                       What the Operating Layer is Cshell + modules)
+├── /platform                       What Axlefield is (shell + modules)
 ├── /modules                        Add-to-cart catalog CCore + 6 modules)
 │
 ├── /services/
@@ -85,7 +85,7 @@ flowchart TD
 
 ## 3. Navigation
 
-**Primary nav:** Operating Layer C`/platform`) · Modules · Services · How we work · Pricing · Contact  
+**Primary nav:** Axlefield (`/platform`) · Modules · Services · How we work · Pricing · Contact  
 
 **Footer only / About:** Ventures · Team · Legal  
 
@@ -99,11 +99,11 @@ flowchart TD
 
 | | |
 | ----- | ----- |
-| **Job** | State the Operating Layer in one breath; show three offers; CTA to modules or contact |
-| **Hero** | *One system for every branch. Add the tools you need.* Sub: *We work like your in-house developers.* |
+| **Job** | State Axlefield in one breath; show three offers; CTA to modules or contact |
+| **Hero** | *The one who connects.* Sub: *Add the tools you need.* Then: *We work like your in-house developers.* |
 | **Must include** | Three offers teaser; who it’s for Cmulti-branch, including franchise); CTA **See modules** / **Talk to us** |
-| **Must not** | Venture collaboration CTA; Readiness Audit; Growth plan table; pure-equity language |
-| **H1 CDOM)** | Plain sentence stating what Axon does Cnot only the wordmark) |
+| **Must not** | Venture collaboration CTA; Readiness Audit; Growth plan table; pure-equity language; “Agentic AI Systems” as H1; Greek script or neuron art in the hero |
+| **H1 CDOM)** | *The one who connects.* — company tagline, not only the wordmark |
 
 ### `/platform`
 
@@ -153,8 +153,9 @@ flowchart TD
 
 | | |
 | ----- | ----- |
-| **Job** | Four named people; hybrid one-liner; link to ventures |
+| **Job** | Four named people; hybrid one-liner; name origin once; link to ventures |
 | **Team** | Jerico CCEO), Aidan CCTO), Gerald CDeputy Eng), Rhandie CDeputy Eng) |
+| **Must include** | Axon = axis / cable that carries signal. Enjin = engine / the one who connects. We connect people through systems. Custom AI only as Offer 3 / mechanism — not a second slogan. |
 
 ### `/about/ventures`
 
@@ -168,7 +169,7 @@ flowchart TD
 
 | | |
 | ----- | ----- |
-| **Job** | Operating Layer sales + optional topic **Collaboration** |
+| **Job** | Axlefield sales + optional topic **Collaboration** |
 | **Fields** | Name, company, branches Coptional), offer interest, message |
 
 ### Legal
@@ -179,7 +180,7 @@ Privacy, terms, data-processing — Company Document §8.4 PIP posture still app
 
 ## 5. Conversion architecture
 
-**Primary conversion:** Contact or module interest COperating Layer Offers 1–2).  
+**Primary conversion:** Contact or module interest (Axlefield Offers 1–2).  
 **Secondary:** Custom AI inquiry COffer 3).  
 **Tertiary:** Collaboration inquiry from `/about/ventures` only.
 
@@ -190,11 +191,12 @@ Forms may still qualify Cbranch count, offer type). Do **not** hard-block single
 ## 6. Copy rules Csite-wide)
 
 1. Grade **5–7** reading level where possible.  
-2. Prefer “one system for every branch” over jargon.  
-3. Product name: **Operating Layer** — not “Franchise Operating Layer” as the title.  
+2. Homepage H1: **The one who connects.** Product copy may still say “one system for every branch.”  
+3. Product name: **Axlefield** — not “Franchise Operating Layer” as the title. FOL is internal/historical only.  
 4. Franchise = strong fit, not the only buyer word.  
 5. §2.4 compliance and payment rules are legal constraints.  
-6. No pure-equity or “build for free” language anywhere public.
+6. No pure-equity or “build for free” language anywhere public.  
+7. No “Agentic AI Systems,” Greek script, or neuron art in the hero.
 
 ---
 
