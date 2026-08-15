@@ -201,11 +201,11 @@ window.__twConfig = { theme: { extend: {
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-xl">
       <span class="h-2 w-2 rounded-full bg-cyan shadow-[0_0_12px_#56c8ff]"></span>
-      <span class="font-display text-lg tracking-[.2em] text-white">AXON ENJIN</span>
+      <a href="/" class="font-display text-lg tracking-[.2em] text-white">AXON ENJIN</a>
     </div>
     <div class="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-ice/60 backdrop-blur-xl md:flex">
       <a href="#about" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">About</a>
-      <a href="#projects" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Projects</a>
+      <a href="/articles/" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Articles</a>
       <a href="#collaborate" class="rounded-full px-4 py-1.5 transition hover:bg-white/10 hover:text-white">Collaborate</a>
     </div>
     <a href="#collaborate" class="flex items-center gap-2 rounded-full bg-blue px-5 py-2.5 text-[13px] font-medium text-white transition hover:brightness-110">
@@ -352,6 +352,42 @@ window.__twConfig = { theme: { extend: {
   </div>
 </section>
 
+<!-- ============================== PROOF ============================== -->
+<section id="proof" class="bg-void py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv mb-12">
+      <p class="text-[11px] uppercase tracking-[.3em] text-ice/40">Proof</p>
+      <h2 class="mt-5 max-w-2xl font-heading uppercase text-white" style="font-size:clamp(34px,4.8vw,64px);line-height:.94;letter-spacing:-.02em">Checkable work</h2>
+      <p class="mt-8 max-w-2xl text-[15px] leading-relaxed text-ice/55">Competitions prove we can build under time pressure. They do not prove we can run a system for years. The write-ups live in Articles.</p>
+    </div>
+    <ul class="space-y-4">
+      <li class="rv flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
+        <span class="text-[15px] text-ice/80">KPMG Philippines Academic Innovation Challenge</span>
+        <a href="/articles/kpmg-academic-innovation.html" class="text-[13px] text-cyan hover:underline">1st · read</a>
+      </li>
+      <li class="rv flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
+        <span class="text-[15px] text-ice/80">Cursor Manila Hack Sprint</span>
+        <a href="https://www.linkedin.com/feed/update/urn:li:activity:7463969640247910400/" class="text-[13px] text-cyan hover:underline">1st · post</a>
+      </li>
+      <li class="rv flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
+        <span class="text-[15px] text-ice/80">BPI DataWave 2025</span>
+        <a href="/articles/bpi-datawave-vesta.html" class="text-[13px] text-cyan hover:underline">1st · read</a>
+      </li>
+      <li class="rv flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
+        <span class="text-[15px] text-ice/80">Build on Stellar Philippines</span>
+        <a href="/articles/axial.html" class="text-[13px] text-cyan hover:underline">2nd runner-up · read</a>
+      </li>
+      <li class="rv flex flex-wrap items-baseline justify-between gap-3 border-b border-white/10 pb-4">
+        <span class="text-[15px] text-ice/80">ASEAN AI Hackathon 2026</span>
+        <a href="https://www.linkedin.com/posts/delatorrecj_ai-smartcity-asean-ugcPost-7466911733828370432-D1fE/" class="text-[13px] text-cyan hover:underline">Top 10 · post</a>
+      </li>
+    </ul>
+    <a href="/articles/" class="rv mt-10 inline-flex items-center gap-2 text-[13px] font-medium text-cyan hover:underline">
+      All articles
+      <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
+    </a>
+  </div>
+</section>
 
 <!-- ============================= 8. TEAM ============================= -->
 <section id="team" class="bg-void py-28 md:py-40">
@@ -366,7 +402,7 @@ window.__twConfig = { theme: { extend: {
       <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
         <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">CEO</span>
         <h3 class="mt-6 font-heading text-2xl uppercase text-white">Jerico</h3>
-        <p class="mt-1 text-[13px] text-ice/45">Carlos Jerico Dela Torre — business, finance, legal</p>
+        <p class="mt-1 text-[13px] text-ice/45">Carlos Jerico Dela Torre — business, finance, legal. Personal writing lives on his own site.</p>
       </div>
       <div class="rv rounded-2xl border border-white/10 bg-deep p-7">
         <span class="rounded-full bg-blue/15 px-3 py-1 text-[11px] text-cyan">CTO</span>
@@ -438,6 +474,7 @@ window.__twConfig = { theme: { extend: {
     <span>&copy; 2026 Axon Enjin</span>
     <div class="flex flex-wrap gap-4">
       <a href="#team" class="hover:text-ice/70">Team</a>
+      <a href="/articles/" class="hover:text-ice/70">Articles</a>
       <a href="/legal" class="hover:text-ice/70">Legal</a>
       <a href="https://delatorre.axonenjin.com/" class="hover:text-ice/70">Jerico</a>
       <span>Metro Manila, Philippines</span>

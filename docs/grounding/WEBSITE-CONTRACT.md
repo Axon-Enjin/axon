@@ -14,7 +14,7 @@ superseded_by:
 
 # Website Contract
 
-> Company copy spine: `COMPANY.md`. Product GTM (offers, modules) lives in OS `COMMERCIAL-MODEL-V2.md` — **not** on `axonenjin.com`.
+> Company copy spine: `COMPANY.md`. Articles: `ARTICLES.md`. Product GTM lives in OS `COMMERCIAL-MODEL-V2.md` — **not** on `axonenjin.com`.
 > Regulatory roots: Company Document §2.4 / §8 (private OS — not mirrored in full).
 
 ## Two public properties
@@ -37,16 +37,19 @@ Relationship line (may appear): *We work like your in-house developers.*
 
 ## Company (`axonenjin.com`)
 
-**Nav:** About · Projects · Collaborate
-**Footer:** Team · Legal · optional Jerico
+**Nav:** About · Articles · Collaborate
+**Footer:** Team · Articles · Legal · optional Jerico
 **CTA:** Let's collaborate / talk to us
+
+**Proof:** a short strip on the home page (max five checkable lines) plus `/articles`. Hackathons never lead the hero (F-12). Case-shaped posts are an article type. Named paying clients only with consent.
 
 **Forbidden on this host**
 
 - See the modules / offer picker / how buying works / module catalog
 - Homepage CTA for Ventures equal to Collaborate
-- Join Our Team, Investments, or Highlights stubs
-- Named unvalidated ventures
+- Join Our Team, Investments, or a Highlights **trophy wall** (a five-line Proof strip is allowed)
+- Named unvalidated ventures; named clients without consent (ChaChing, BlueBiz, Full Cup)
+- TEDx / student-chapter awards in the company Proof strip (founder site)
 - Any peso or other currency amounts (F-34 / D-2026-001)
 - BIR / BSP accreditation we do not hold; “fully compliant”; payment acceptance as an Axon Enjin capability
 - Pure-equity / “we build for free equity”
@@ -64,11 +67,12 @@ Offers and catalog are **not** copied onto the company HTML.
 - We are an operating company; ventures are secondary
 - Four named people in Metro Manila
 - Axlefield exists as an Axon Enjin product (outbound)
+- Checkable competition results **as supporting detail**, with a write-up or public post
 - Cash floor for venture collaboration; equity optional and rare
 - Plain language (5th–7th grade)
 
 ## When editing the company website
 
-1. Read this contract + `COMPANY.md` + `SITEMAP.md` v3.1.
+1. Read this contract + `COMPANY.md` + `ARTICLES.md` + `SITEMAP.md` v3.2.
 2. If copy would invent pricing, legal conclusions, clients, press, or extra projects → stop.
 3. If doctrine conflict suspected → flag; do not silently choose.

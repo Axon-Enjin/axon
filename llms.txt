@@ -8,10 +8,13 @@ Axon Enjin is the **company**: an operating company and studio in Metro Manila, 
 
 Ventures are secondary (Collaborate). Ventures get their own names; do not invent named ventures.
 
+Public writing: https://axonenjin.com/articles/ — constraint, artifact, lesson. Hackathons are supporting detail, not the company headline.
+
 ## Canonical docs (company)
 
 - /docs/grounding/COMPANY.md
 - /docs/grounding/WEBSITE-CONTRACT.md
+- /docs/grounding/ARTICLES.md
 - /docs/grounding/SITEMAP.md
 
 Company OS (private): https://github.com/Axon-Enjin/company-docs

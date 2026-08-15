@@ -28,8 +28,9 @@ This folder is the **only** surface of `company-docs` that may be mirrored to pu
 | File | Role |
 | ----- | ----- |
 | `WEBSITE-CONTRACT.md` | Allowed / forbidden claims; company CTAs; F-34 |
-| `SITEMAP.md` | Two-property IA (v3.1) |
+| `SITEMAP.md` | Two-property IA (v3.2) |
 | `COMPANY.md` | Who we are — company-host copy spine |
+| `ARTICLES.md` | Post types, seed inventory, proof rules |
 | `BRAND-VOICE.md` | Plain-language + regulatory voice |
 | `GROUNDING-MANIFEST.yml` | Version + `company_mirror` / `product_only` |
 | `README.md` | This file |

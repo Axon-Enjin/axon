@@ -52,6 +52,8 @@ Four named people in Metro Manila: Jerico (CEO), Aidan (CTO), Gerald (Deputy Eng
 
 Secondary. Cash floor; equity optional and rare; **no pure-equity CTA**. Do not name unvalidated ventures. Capacity is small. Filter: clear problem, someone who will run it, fit for a four-person team.
 
-## Proof we will not invent
+## Proof
 
-No investments grid. No highlights/press. No Join Our Team. No client logos without a reference we would actually take.
+The **body of work** lives on `/articles` (constraint → artifact → lesson). Home may show a **short Proof strip** (max five checkable lines). Hackathons prove build skill under time pressure — never the H1.
+
+**Do not invent:** named paying clients without consent; extra projects; press walls; TEDx/MRSP as company trophies.

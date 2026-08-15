@@ -18,8 +18,9 @@ This host **does not sell**. Product GTM is not mirrored here.
 
 1. [`grounding/WEBSITE-CONTRACT.md`](grounding/WEBSITE-CONTRACT.md)
 2. [`grounding/COMPANY.md`](grounding/COMPANY.md)
-3. [`grounding/SITEMAP.md`](grounding/SITEMAP.md)
-4. [`grounding/BRAND-VOICE.md`](grounding/BRAND-VOICE.md)
+3. [`grounding/ARTICLES.md`](grounding/ARTICLES.md)
+4. [`grounding/SITEMAP.md`](grounding/SITEMAP.md)
+5. [`grounding/BRAND-VOICE.md`](grounding/BRAND-VOICE.md)
 
 ## Sync
 

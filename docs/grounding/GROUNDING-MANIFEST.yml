@@ -2,7 +2,7 @@
 # Company consumer: Axon-Enjin/website → docs/grounding/
 # Product files stay in this folder for the Axlefield repo later — they are not mirrored to the company site.
 
-pack_version: "1.2.0"
+pack_version: "1.2.1"
 exported: "2026-08-16"
 authority: level-2
 source_repo: Axon-Enjin/company-docs
@@ -13,6 +13,7 @@ company_mirror:
   - WEBSITE-CONTRACT.md
   - SITEMAP.md
   - COMPANY.md
+  - ARTICLES.md
   - BRAND-VOICE.md
   - GROUNDING-MANIFEST.yml
   - README.md
@@ -25,6 +26,7 @@ files:
   - WEBSITE-CONTRACT.md
   - SITEMAP.md
   - COMPANY.md
+  - ARTICLES.md
   - BRAND-VOICE.md
   - GROUNDING-MANIFEST.yml
   - README.md

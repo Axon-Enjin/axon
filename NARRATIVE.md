@@ -1,6 +1,6 @@
 # Axon Enjin — Company page copy
 
-**Governed by:** [`docs/grounding/COMPANY.md`](docs/grounding/COMPANY.md) · [`docs/grounding/WEBSITE-CONTRACT.md`](docs/grounding/WEBSITE-CONTRACT.md) · [`docs/grounding/SITEMAP.md`](docs/grounding/SITEMAP.md)
+**Governed by:** [`docs/grounding/COMPANY.md`](docs/grounding/COMPANY.md) · [`docs/grounding/WEBSITE-CONTRACT.md`](docs/grounding/WEBSITE-CONTRACT.md) · [`docs/grounding/ARTICLES.md`](docs/grounding/ARTICLES.md) · [`docs/grounding/SITEMAP.md`](docs/grounding/SITEMAP.md)
 
 This host **does not sell**. Grade 5–7. No currency amounts. No Operating Layer as a public title.
 
@@ -32,6 +32,14 @@ Etymology once. Operating company first. Studio second. We do not fake accredita
 ## Projects
 
 One card: **Axlefield** — an Axon Enjin product. Visit site. Not a catalog.
+
+## Proof
+
+Five checkable lines after Projects. Competitions = speed under a clock, not years of delivery. Links to articles or public posts. No TEDx/MRSP here.
+
+## Articles
+
+`/articles` — Build / Think / Operate / Case. Seed: KPMG, BPI VESTA, Axial.
 
 ## Team
 
