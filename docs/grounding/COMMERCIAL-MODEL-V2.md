@@ -5,18 +5,18 @@ status: active
 authority: level-2
 owner: Jerico
 created: 2026-08-08
-updated: 2026-08-11
+updated: 2026-08-15
 review_cycle: 90-days
 source_of_truth: 01_STRATEGY/COMMERCIAL-MODEL-V2.md
-supersedes: Company Document GTM packaging (5-rung ladder, archetype hub, Starter/Growth/Enterprise for public use)
+supersedes: Company Document GTM packaging (5-rung ladder, archetype hub, Starter/Growth/Enterprise for public use and quotations — D-2026-005)
 superseded_by:
 ---
 # Axon Enjin — Commercial Model v2
 
-**Status:** Canonical for go-to-market, website, and public offers (8 August 2026)  
+**Status:** Canonical for go-to-market, website, public offers, **and quotation packaging** (8 August 2026; F-03 closed 11 August 2026)  
 **Team:** Carlos Jerico Dela Torre (CEO) · Aidan Tiu (CTO) · Gerald Berongoy (Deputy Engineer) · Rhandie Sales Jr. (Deputy Engineer)
 
-> **Precedence.** For what we sell publicly, how we deliver, and how the site talks, **this file wins** over the Company Document’s old offer ladder (5-rung audit path), archetype pack hub, and Starter / Growth / Enterprise rate card. The Company Document still governs identity roots, regulatory doctrine (§8), voice constraints (§2.4), and venture structure (§3) unless this file says otherwise.
+> **Precedence.** For what we sell publicly, how we deliver, how the site talks, **and how we package quotations**, **this file wins** over the Company Document’s old offer ladder (5-rung audit path), archetype pack hub, and Starter / Growth / Enterprise rate card (**retired — D-2026-005 / F-03**). The Company Document still governs identity roots, regulatory doctrine (§8), voice constraints (§2.4), and venture structure (§3) unless this file says otherwise.
 >
 > **Plain language.** Customer-facing copy should be clear to a **5th–7th grader**. Short words. Short sentences. Teach hard words only once, if at all.
 
@@ -35,15 +35,20 @@ We work like **in-house developers**: close to the business, not a distant agenc
 
 ## 2. Public product name
 
-**Operating Layer** — one system for every branch. You start empty. You add the tools you need.
+**Axlefield** (D-2026-009) — *An Axon Enjin product.* An operating **ecosystem**: Core (central database / empty shell), catalog modules, third-party integrations, and the people who run it. You start empty. You add the tools you need.
 
 - **Who it’s for:** people who run more than one branch (multi-branch). Franchise networks are a strong fit — not the only word in the title.
-- **Do not** put “Franchise Operating Layer” as the homepage title. Franchise is a use case, not the product name.
-- Avoid the acronym “FOL” on the public site unless the plain name is already clear.
+- **Do not** put “Franchise Operating Layer,” “FOL,” “ERP,” or “business operating system” as the homepage title. Franchise is a use case. Axlefield is the product name.
+- SKUs: **Axlefield Core**, **Axlefield modules**, **Axlefield custom**.
+- Operating Layer / FOL = internal/historical only.
 
 **Plain one-liner:** *One system for every branch. Add the tools you need.*
 
 **Relationship one-liner:** *We work like your in-house developers.*
+
+**Website company tagline (D-2026-008):** *The one who connects.* — homepage H1. About teaches axon (axis / cable / signal) and enjin (engine / connector). Do **not** put “Agentic AI Systems,” Greek script, or neuron art on the H1. Product name: **Axlefield** (D-2026-009). Product sub: *Add the tools you need.* Lexicon: [`11_MARKETING/BRAND.md`](../11_MARKETING/BRAND.md).
+
+**Upwork / international channel tagline (D-2026-007):** *In-house developers. Without the hire.* — profile headline and first overview line only. Does **not** replace the product one-liner. Does **not** go on the website hero. Copy: [`11_MARKETING/UPWORK.md`](../11_MARKETING/UPWORK.md). Not an ICP rewrite; §7.6.2 / F-11 still govern agency mix.
 
 ---
 
@@ -51,16 +56,16 @@ We work like **in-house developers**: close to the business, not a distant agenc
 
 | # | Offer | Who | What they get |
 | ----- | ----- | ----- | ----- |
-| **1** | Modular Operating Layer (pre-made, add to cart) | Multi-branch (preferred) | Empty Core shell + catalog modules they buy. Standard setup. |
-| **2** | Operating Layer + customization | Multi-branch who need a fit | Offer 1, plus paid changes (fields, workflows, extra tabs, non-catalog integrations). |
+| **1** | Modular Axlefield (pre-made, add to cart) | Multi-branch (preferred) | Empty **Axlefield Core** + catalog modules they buy. Standard setup. |
+| **2** | Axlefield + customization | Multi-branch who need a fit | Offer 1, plus paid changes (fields, workflows, extra tabs, non-catalog integrations). |
 | **3** | Custom-build AI software | Any entity, including single-location | New software built for them — not sold as catalog modules. |
 
 ### Offer 1 — Modular (add to cart)
 
-- Client gets an **empty ERP shell** (Core).
+- Client gets an **empty Axlefield Core** (shell).
 - They **purchase modules**. Each purchase unlocks a **tab** in the same system.
 - Axon builds and owns the shell and the modules as product.
-- Recurring subscription (unit and pesos: **internal / quotation only** — **F-34**: never on the public site. Do not use old Growth plan numbers — **F-01/F-03**).
+- Recurring subscription (unit and pesos: **internal / quotation only** — **F-34**: never on the public site. Do not use old Growth / Starter / Enterprise numbers — **F-03 closed**, D-2026-005).
 
 ### Offer 2 — + Customization
 
@@ -80,7 +85,7 @@ We work like **in-house developers**: close to the business, not a distant agenc
 | Who | Owns what |
 | ----- | ----- |
 | **Client** | The custom app they paid for (after handoff) |
-| **Axon** | Reusable libraries, frameworks, starter kits, and general patterns — may reuse in the Operating Layer and other work |
+| **Axon** | Reusable libraries, frameworks, starter kits, and general patterns — may reuse in Axlefield and other work |
 | **Venture path** | IP sits in the **venture company**; Axon holds equity + a service agreement — different from Offer 3 |
 
 Every Offer 3 contract must state this split in writing.
@@ -107,7 +112,7 @@ Modules are **products**. Buying one adds a tab. Axon builds all of them.
 | **Accounting** | Catalog — **safe scope** | Management books, reports, and **export / sync to the client’s own registered CAS**. **Not** “we replace BIR invoicing.” Do not claim accreditation or full CAS replacement. |
 | **Scheduling** | Catalog | Bookings / shifts / appointments as defined in the module brief. |
 
-**Retired from public packaging:** Royalty, LMS, Field audit, Territory packs; archetype packs A–E as the site structure; Starter / Growth / Enterprise plan math.
+**Retired from public packaging and quotations:** Royalty, LMS, Field audit, Territory packs; archetype packs A–E as the site structure; Starter / Growth / Enterprise plan math (**D-2026-005**).
 
 **Pricing:** **No pesos on the website (F-34).** Catalog shows scope only + “talk to us” / book a call. Numbers live in quotations. Quotations must use a **dynamic FX converter** when converting currencies (**F-35**).
 
@@ -172,7 +177,7 @@ flowchart TD
 
 ## 6. Ventures arm (secondary on the website)
 
-**On the site:** `/about/ventures` + footer only. **No** homepage CTA equal to the Operating Layer. **No** primary-nav “Ventures.”
+**On the site:** `/about/ventures` + footer only. **No** homepage CTA equal to Axlefield. **No** primary-nav “Ventures.”
 
 **Plain pitch:** *We can be the builders inside your startup.*
 
@@ -183,7 +188,7 @@ flowchart TD
 1. The problem is clear.
 2. Someone will run the business (not idea-only).
 3. They bring something real (domain, customers, or cash).
-4. It fits a **4-person** team without starving paying Operating Layer work.
+4. It fits a **4-person** team without starving paying Axlefield work.
 
 **Commercial (public):**
 
@@ -192,7 +197,7 @@ flowchart TD
 - **Never** advertise pure-equity or “we build for free equity” on the website.
 - Pure equity only for **close people**, private, off-site.
 
-**Client fear framing (keep):** Unlike an agency, we own products and build ventures — so the tools get better whether or not you are paying this month. Ventures are why the Operating Layer improves — not a competing product on the homepage.
+**Client fear framing (keep):** Unlike an agency, we own products and build ventures — so the tools get better whether or not you are paying this month. Ventures are why Axlefield improves — not a competing product on the homepage.
 
 **Capacity:** Equity-for-build stays capped (Company Document: ≤15% of quarterly delivery capacity, never below cash-cost recovery). Cash floor always. Venture work must not crowd out paying delivery.
 
@@ -205,8 +210,8 @@ flowchart TD
 - ₱95k Readiness Audit as the hero conversion
 - Automation Sprint / Compliance Pack / Engine retainer as a public ladder
 - Archetype hub (`/for/store`, etc.) as Phase-1 IA
-- Starter / Growth / Enterprise as published plans
-- “Not an ERP” as the headline — we sell an Operating Layer that *is* a modular ERP shell + modules
+- Starter / Growth / Enterprise as published **or quoted** plans (D-2026-005)
+- “ERP” or “business OS” as the headline — we sell **Axlefield**, an operating ecosystem (Core + modules + integrations + people). Do not lead with “not an ERP” either.
 
 Internal paid discovery for Offers 2–3 is still allowed; it is not the brand’s front door.
 
@@ -227,7 +232,7 @@ From Company Document §2.4 / §8 — still binding:
 
 Someone on the homepage should get this in one breath:
 
-> *One system for every branch. Add tools. Or we build custom AI. We work like your in-house developers.*
+> *The one who connects.* Then the product: **Axlefield** — *One system for every branch. Add tools. Or we build custom AI. We work like your in-house developers.*
 
 Ventures are findable, never first. Offer 3: you own the app; we keep our shared tools; one year care by default. Collab seekers see a cash floor, not free equity.
 
@@ -237,7 +242,7 @@ Ventures are findable, never first. Offer 3: you own the app; we keep our shared
 
 | # | Ask | Why it’s open | Unblock with |
 | ----- | ----- | ----- | ----- |
-| **A1** | **V2 price list for quotations** — Core + modules + Offer 2/3 (Build + 12 mo care) | Old §6 numbers exist but are unquotable ([`FLAGS.md`](../00_GOVERNANCE/../00_GOVERNANCE/FLAGS.md) F-01/F-02/F-03). New list is for **quotes only** — see **F-34** (no pesos on the site). | Founder price list mapped to Offer 1–3 + modules; used in quote templates only |
+| **A1** | **V2 price list for quotations** — Core + modules + Offer 2/3 (Build + 12 mo care) | Packaging shape locked (F-01–F-03 closed; D-2026-005 = quote V2 only). Pesos still **REQUIRES DECISION**. Quotes only — **F-34**. SKU template: `09_FINANCE/PRICING/V2-A1-QUOTE-LIST.md` (D-2026-006 Proposed). | Founder fills pesos in the quote list and Accepts D-2026-006 |
 | **A2** | **Google Calendar booking** on the site contact CTA | Prospects book a call on Google Calendar. No booking URL in the repo yet. | Share the public Google Calendar appointment link; wire CTAs → that URL |
 | **A3** | **Dynamic FX converter for quotations** | Quotes must convert at an up-to-date rate, not a stale peg — **F-35**. | Choose feed (e.g. BAP), stamp rate + date + source on every quote; optional small tool/sheet |
 

@@ -26,4 +26,4 @@ superseded_by:
 | **Accounting** | Catalog — safe scope | Management books, reports, and export / sync to the client’s own registered CAS. Not a BIR invoicing replacement. |
 | **Scheduling** | Catalog | Bookings / shifts / appointments as defined in the module brief. |
 
-**Retired from public packaging:** Royalty, LMS, Field audit, Territory packs; archetype packs as site structure; Starter / Growth / Enterprise plan math.
+**Retired from public packaging and quotations:** Royalty, LMS, Field audit, Territory packs; archetype packs as site structure; Starter / Growth / Enterprise plan math (D-2026-005).
