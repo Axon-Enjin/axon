@@ -5,7 +5,7 @@ status: active
 authority: level-2
 owner: Jerico
 created: 2026-08-11
-updated: 2026-08-15
+updated: 2026-08-16
 review_cycle: 90-days
 source_of_truth: 11_MARKETING/website-grounding/README.md
 supersedes:
@@ -14,31 +14,35 @@ superseded_by:
 
 # Website Grounding Pack
 
-This folder is the **only** surface of `company-docs` that may be mirrored to the public website repository (`Axon-Enjin/website`).
+This folder is the **only** surface of `company-docs` that may be mirrored to public website repositories.
 
-Public IA is **two properties**: company (`axonenjin.com`) vs product (`axlefield.axonenjin.com`). See `WEBSITE-CONTRACT.md` and `SITEMAP.md` v3.
+**Two properties.** Company (`axonenjin.com`) tells who we are. Product (`axlefield.axonenjin.com`) sells Axlefield. The company site does **not** sell.
 
 ## Why this exists
 
-- The company OS holds client records, finance, founder bottlenecks, and strategy — **not** for the marketing site.
-- The website must stay **true** to GTM doctrine without becoming a second source of truth for the whole company.
+- The company OS holds client records, finance, and strategy — **not** for the marketing site.
 - Sync is **curated + reviewable** (PR), not a blind clone of the private OS.
 
-## Pack contents
+## Company mirror (`axon-website` → `docs/grounding/`)
 
 | File | Role |
 | ----- | ----- |
-| `WEBSITE-CONTRACT.md` | Allowed / forbidden claims; CTAs; F-34 |
-| `COMMERCIAL-MODEL-V2.md` | Public GTM source of truth (copy) |
-| `SITEMAP.md` | Website IA |
-| `BRAND-VOICE.md` | Plain-language + regulatory voice summary |
-| `MODULE-CATALOG.md` | Module SKUs and public scope (no prices) |
-| `GROUNDING-MANIFEST.yml` | Version + authority checksum metadata |
+| `WEBSITE-CONTRACT.md` | Allowed / forbidden claims; company CTAs; F-34 |
+| `SITEMAP.md` | Two-property IA (v3.1) |
+| `COMPANY.md` | Who we are — company-host copy spine |
+| `BRAND-VOICE.md` | Plain-language + regulatory voice |
+| `GROUNDING-MANIFEST.yml` | Version + `company_mirror` / `product_only` |
+| `README.md` | This file |
 
-## Consumer path
+## Product only (stay in OS — Axlefield repo later)
 
-`Axon-Enjin/website` → `docs/grounding/` (committed mirror)
+| File | Role |
+| ----- | ----- |
+| `COMMERCIAL-MODEL-V2.md` | Public GTM / offers |
+| `MODULE-CATALOG.md` | Module SKUs (no prices) |
+
+The sync workflow **must not** copy product-only files onto `axon-website`.
 
 ## Change rule
 
-When V2, sitemap, or this pack changes → open a PR on `Axon-Enjin/website` updating `docs/grounding/`. Humans review before merge.
+When sitemap or this pack changes → open a PR on `Axon-Enjin/website` updating `docs/grounding/`. Humans review before merge.

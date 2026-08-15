@@ -1,21 +1,10 @@
-# Build prompt — AXON, "Genesis of a Signal"
+# Genesis engine — craft notes
 
-Recreate the website **Axon** with high visual fidelity as a Tailwind CSS and Vanilla JavaScript site.
-The result must be a cinematic, scroll-driven creation myth: **one node sparks, multiplies, connects, orbits, and resolves into a living network.** Big bang as brand story. The network *is* the hero asset — there is no hero video.
+Internal. Not website doctrine. Copy and IA live in `docs/grounding/` (`COMPANY.md`, `WEBSITE-CONTRACT.md`, `SITEMAP.md`) and root `NARRATIVE.md`.
 
----
+Recreate the **Axon Enjin** company homepage genesis with high visual fidelity as Tailwind CSS and vanilla JavaScript: **one node sparks, multiplies, connects, orbits, and resolves into a living network.** The network *is* the hero asset — there is no hero video.
 
-## CONTENT GOVERNANCE (8 August 2026)
-
-Visual fidelity rules below still apply. **Copy and IA follow Commercial Model v2**, not the old audit ladder.
-
-- **Source of truth for offers/copy:** [`docs/grounding/COMMERCIAL-MODEL-V2.md`](docs/grounding/COMMERCIAL-MODEL-V2.md), [`docs/grounding/SITEMAP.md`](docs/grounding/SITEMAP.md), [`docs/grounding/WEBSITE-CONTRACT.md`](docs/grounding/WEBSITE-CONTRACT.md), [`NARRATIVE.md`](NARRATIVE.md)
-- **Company OS (private):** [Axon-Enjin/company-docs](https://github.com/Axon-Enjin/company-docs) — do not treat retired local docs as SoT
-- **Product name:** Operating Layer — *One system for every branch. Add the tools you need.*
-- **Three offers only:** modules (add to cart) · modules + customization · custom AI (Build + 12 mo; client owns app)
-- **Ventures:** secondary (footer / late section only); cash floor; no pure-equity CTA
-- **Voice:** plain language (5th–7th grade); never claim BIR/BSP accreditation; never say we accept payments
-- **Do not rebuild** archetype hub or Readiness Audit as the primary CTA
+This host does **not** sell. Scene copy is company presence (*The one who connects.*), not a product catalog.
 
 ---
 
@@ -449,7 +438,7 @@ Second impact flash (weaker, 0.55 peak) at 0.795, this one tinted `--blue` not w
 > `04 — ASCENSION`
 > **AXON** (JamjanNP, `clamp(64px,14vw,220px)`)
 > subline in Anton: **EVERY CONNECTION IS A DECISION**
-> CTA pill: `bg-[#2e6fff] text-white`, Garet 500, label "See the work", icon `solar:arrow-right-linear`.
+> CTA pill: `bg-[#2e6fff] text-white`, Garet 500, label "Let's collaborate", icon `solar:arrow-right-linear`.
 
 A thin progress rail sits at `bottom-8`, width `224px`, filled in `--cyan` with `box-shadow: 0 0 12px #56c8ff`.
 
@@ -505,14 +494,9 @@ glitch. The four-point glints are the constellation tell; without them it is noi
 
 ---
 
-## SECTIONS 2 TO 5 (flat, after the scroller)
+## SECTIONS AFTER THE SCROLLER (company presence)
 
-- **02 STUDIO** — bg `#04060d`. Grid `0.75fr 1.15fr 0.9fr` at `lg`. Anton heading. Partner strip in Anton at `text-2xl text-white/25`. Rating card on `--deep` with `-space-x-2` stacked avatars and a `+9` chip.
-- **03 WORK** — bg `#04060d`. Three `<article>` cards, `aspect-[4/5]`, images `grayscale transition duration-1000 group-hover:grayscale-0 group-hover:scale-105`.
-- **04 NETWORK** — the team. Cards on `--deep`, each with a `bg-[#2e6fff] text-white` badge top-left of the image, `border-t border-white/10` separator above social links and "View profile".
-- **05 CONTACT** — full-bleed `--deep` panel, `rounded-3xl`, Anton heading, one mailto CTA in `--blue`.
-
-Reveal these with a single `IntersectionObserver` at `threshold: 0.15`, translateY 26px to 0, 0.8s `cubic-bezier(.2,.7,.2,1)`, staggered `(i % 3) * 90ms`. Respect `prefers-reduced-motion: reduce` by disabling the reveal and pinning scroll progress smoothing to 1.
+Do not rebuild a product catalog here. Flat sections: **About**, **Core Projects** (one Axlefield card), **Team**, **Collaborate**, **Contact**. Reveal with a single `IntersectionObserver` at `threshold: 0.15`. Respect `prefers-reduced-motion: reduce`.
 
 ---
 

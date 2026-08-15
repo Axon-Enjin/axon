@@ -1,5 +1,5 @@
 ---
-description: Website copy must follow company-docs grounding pack only
+description: Company website copy follows the company grounding pack only — do not sell
 globs:
   - "**/*.{html,md,txt}"
 alwaysApply: true
@@ -8,10 +8,11 @@ alwaysApply: true
 # Website grounding rules
 
 - Company doctrine lives in private `Axon-Enjin/company-docs`.
-- For customer-facing copy and IA, read only `docs/grounding/` — especially `WEBSITE-CONTRACT.md`, `COMMERCIAL-MODEL-V2.md`, and `SITEMAP.md`.
-- IA is two-property: `axonenjin.com` (company) and `axlefield.axonenjin.com` (product). Do not merge them into one public nav.
-- Never invent prices, compliance claims, or payment acceptance.
+- This repo is **company-only** (`axonenjin.com`). It does **not** sell.
+- For customer-facing copy and IA, read `docs/grounding/COMPANY.md`, `WEBSITE-CONTRACT.md`, and `SITEMAP.md`.
+- IA is two-property: company here; product at `axlefield.axonenjin.com` (other repo).
+- Never invent prices, clients, press, investments, or extra projects.
 - No peso/currency amounts on the public site (F-34).
-- Ventures are secondary on the **company** site (Collaborate / footer only). Never on Axlefield primary nav or as an equal CTA.
+- Ventures are secondary (Collaborate section). Never primary nav. Never an equal CTA to Collaborate.
 - If grounding conflicts with live HTML, flag it — do not silently invent a third doctrine.
-- Do not treat `docs/_retired-to-company-docs/` as source of truth.
+- Do not treat deleted `_retired-to-company-docs/` or product GTM files as source of truth on this host.

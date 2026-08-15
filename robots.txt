@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /docs/
-Disallow: /docs/_retired-to-company-docs/
 
 Sitemap: https://axonenjin.com/sitemap.xml
